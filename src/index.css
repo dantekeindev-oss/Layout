@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-slate-700; }
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold
+           transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900
+           disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-500 focus:ring-indigo-500 shadow-sm;
+  }
+  .btn-secondary {
+    @apply bg-slate-700 text-slate-100 hover:bg-slate-600 focus:ring-slate-500;
+  }
+  .btn-outline {
+    @apply border border-slate-600 text-slate-200 bg-slate-800 hover:bg-slate-700 focus:ring-slate-500;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500 focus:ring-red-500;
+  }
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-slate-300 hover:bg-slate-800 focus:ring-slate-500;
+  }
+
+  .card {
+    @apply bg-slate-800 rounded-xl border border-slate-700 shadow-lg;
+  }
+  .card-hover {
+    @apply card hover:border-slate-500 hover:shadow-xl transition-all cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-primary { @apply bg-indigo-900/60 text-indigo-300 ring-1 ring-indigo-700/60; }
+  .badge-success { @apply bg-emerald-900/60 text-emerald-300 ring-1 ring-emerald-700/60; }
+  .badge-warning { @apply bg-amber-900/60  text-amber-300  ring-1 ring-amber-700/60; }
+  .badge-danger  { @apply bg-red-900/60    text-red-300    ring-1 ring-red-700/60; }
+  .badge-gray    { @apply bg-slate-700     text-slate-300  ring-1 ring-slate-600; }
+
+  .input {
+    @apply block w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm
+           text-slate-100 placeholder-slate-500
+           focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors;
+  }
+}
+
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
