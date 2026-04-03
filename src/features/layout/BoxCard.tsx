@@ -5,6 +5,16 @@ import type { Box, BoxOccupation } from '../../types';
 import { isFemale } from '../../lib/utils/gender';
 import { AgentAvatar } from './AgentAvatar';
 
+const ZONE_ACCENT: Record<string, string> = {
+  'LID 1': '#3b82f6',
+  'LID 2': '#10b981',
+  'LID 3': '#f59e0b',
+  'LID 4': '#a855f7',
+  'LID 5': '#ec4899',
+  'LID 6': '#f97316',
+  'LID 7': '#06b6d4',
+};
+
 interface BoxCardProps {
   box: Box;
   isSelected: boolean;
@@ -24,6 +34,7 @@ export const BoxCard = memo(({
   const female = occ ? isFemale(occ.agentName) : false;
   const hasNext = !occ && !!box.nextOccupant;
   const isInactive = !box.activo;
+  const zoneColor = ZONE_ACCENT[box.zona] ?? '#475569';
 
   if (isInactive) {
     return (
@@ -46,7 +57,7 @@ export const BoxCard = memo(({
   return (
     <div
       onClick={onClick}
-      title={occ ? `${occ.agentName} · ${occ.entryTime}–${occ.exitTime}` : `Box ${box.numero}`}
+      title={occ ? `${occ.agentName} · ${occ.entryTime}–${occ.exitTime}` : `Box ${box.numero} · ${box.zona}`}
       className={clsx(
         'w-full h-full flex flex-col rounded-xl overflow-hidden cursor-pointer select-none transition-all duration-150',
         // background
@@ -59,17 +70,26 @@ export const BoxCard = memo(({
         isHighlighted && !isSelected && '!border-amber-400 shadow-lg shadow-amber-900/40',
         isDimmed      && 'opacity-15 pointer-events-none',
       )}
+      style={{ borderLeft: `3px solid ${isSelected ? '#818cf8' : isHighlighted ? '#fbbf24' : zoneColor}` }}
     >
+      {/* ── Zone accent bar ── */}
+      <div style={{ height: 3, backgroundColor: zoneColor, opacity: occ ? 0.7 : 0.3 }} />
+
       {/* ── Top strip ── */}
       <div className={clsx(
         'flex items-center justify-between px-2 py-1 shrink-0',
         isLeader ? 'bg-amber-500/20' : occ ? 'bg-slate-700/40' : 'bg-slate-800/40',
       )}>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide leading-none">
-          Box {box.numero}
-        </span>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-[11px] font-bold text-slate-300 leading-none tabular-nums">
+            {box.numero}
+          </span>
+          <span className="text-[8px] font-semibold leading-none truncate" style={{ color: zoneColor, opacity: 0.85 }}>
+            {box.zona}
+          </span>
+        </div>
         {isLeader && (
-          <span className="text-[8px] bg-amber-500 text-amber-950 font-black px-1.5 py-0.5 rounded-full leading-none uppercase tracking-wide">
+          <span className="text-[8px] bg-amber-500 text-amber-950 font-black px-1.5 py-0.5 rounded-full leading-none uppercase tracking-wide shrink-0">
             Líder
           </span>
         )}

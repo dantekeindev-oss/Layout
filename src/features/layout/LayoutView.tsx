@@ -33,6 +33,27 @@ const DARK_ZONE_COLORS: Record<string, string> = {
   'LID 7': '#164e63',
 };
 
+// Accent colors matching BoxCard ZONE_ACCENT
+const ZONE_ACCENT_COLORS: Record<string, string> = {
+  'LID 1': '#3b82f6',
+  'LID 2': '#10b981',
+  'LID 3': '#f59e0b',
+  'LID 4': '#a855f7',
+  'LID 5': '#ec4899',
+  'LID 6': '#f97316',
+  'LID 7': '#06b6d4',
+};
+
+const ZONE_BOX_RANGES: Record<string, string> = {
+  'LID 1': 'Boxes 1–29',
+  'LID 2': 'Boxes 30–43',
+  'LID 3': 'Boxes 44–55',
+  'LID 4': 'Boxes 56–68',
+  'LID 5': 'Boxes 69–74',
+  'LID 6': 'Boxes 75–81',
+  'LID 7': 'Boxes 82–91',
+};
+
 function getDarkZoneColor(zone: string) {
   return DARK_ZONE_COLORS[zone] || '#1e293b';
 }
@@ -467,11 +488,23 @@ export function LayoutView() {
                   return (
                     <div
                       key={cell.id}
-                      style={{ gridRow: cell.fila, gridColumn: `1 / span ${cols}`, display: 'flex', alignItems: 'center', gap: 8 }}
+                      style={{
+                        gridRow: cell.fila,
+                        gridColumn: `1 / span ${cols}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        backgroundColor: '#080d18',
+                        borderRadius: 6,
+                        border: '1px solid #1e293b',
+                        padding: '0 12px',
+                      }}
                     >
-                      <div style={{ flex: 1, height: 1, background: '#334155' }} />
-                      <span style={{ fontSize: 9, color: '#475569', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Pasillo</span>
-                      <div style={{ flex: 1, height: 1, background: '#334155' }} />
+                      <div style={{ flex: 1, height: 1, background: 'repeating-linear-gradient(90deg, #1e293b 0, #1e293b 6px, transparent 6px, transparent 12px)' }} />
+                      <span style={{ fontSize: 8, color: '#334155', fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                        ← PASILLO →
+                      </span>
+                      <div style={{ flex: 1, height: 1, background: 'repeating-linear-gradient(90deg, #1e293b 0, #1e293b 6px, transparent 6px, transparent 12px)' }} />
                     </div>
                   );
                 }
@@ -563,16 +596,34 @@ export function LayoutView() {
             </div>
 
             {/* Legend */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
-              {layout.zones.map((zone) => (
-                <div key={zone.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: getDarkZoneColor(zone.name), border: '1px solid rgba(255,255,255,0.1)' }} />
-                  <span style={{ fontSize: 10, color: '#64748b', fontWeight: 600 }}>{zone.name}</span>
+            <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {layout.zones.map((zone) => {
+                  const accent = ZONE_ACCENT_COLORS[zone.name] ?? '#475569';
+                  const range  = ZONE_BOX_RANGES[zone.name] ?? '';
+                  return (
+                    <div key={zone.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      backgroundColor: '#0f172a', border: `1px solid ${accent}30`,
+                      borderLeft: `3px solid ${accent}`, borderRadius: 6, padding: '4px 8px',
+                    }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: accent, fontWeight: 700, lineHeight: 1 }}>{zone.name}</div>
+                        <div style={{ fontSize: 8, color: '#475569', fontWeight: 500, marginTop: 2 }}>{range}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  backgroundColor: '#0f172a', border: '1px solid #d9770630',
+                  borderLeft: '3px solid #d97706', borderRadius: 6, padding: '4px 8px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: '#d97706', fontWeight: 700, lineHeight: 1 }}>Líder</div>
+                    <div style={{ fontSize: 8, color: '#475569', fontWeight: 500, marginTop: 2 }}>Jefe de equipo</div>
+                  </div>
                 </div>
-              ))}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: '#d97706', border: '1px solid rgba(255,255,255,0.1)' }} />
-                <span style={{ fontSize: 10, color: '#64748b', fontWeight: 600 }}>Líder</span>
               </div>
             </div>
           </div>
