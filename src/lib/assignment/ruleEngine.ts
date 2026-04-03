@@ -277,7 +277,7 @@ const AISLE_ROWS = new Set([2, 4, 7, 10]);
  * Returns true if there is at least one aisle row between row1 and row2.
  * If true, the two boxes are in different "blocks" separated by a pasillo.
  */
-function hasPasilloBetwwenRows(row1: number, row2: number): boolean {
+function hasPasilloBetweenRows(row1: number, row2: number): boolean {
   const lo = Math.min(row1, row2);
   const hi = Math.max(row1, row2);
   for (let r = lo + 1; r < hi; r++) {
@@ -342,7 +342,7 @@ export function calculateAssignmentScore(
   if (config.prioritizeTeamProximity && leaderBox) {
     const rowDiff   = Math.abs(box.fila - leaderBox.fila);
     const colDiff   = Math.abs(box.columna - leaderBox.columna);
-    const sameBlock = !hasPasilloBetwwenRows(box.fila, leaderBox.fila);
+    const sameBlock = !hasPasilloBetweenRows(box.fila, leaderBox.fila);
 
     // ── Column proximity (same-column = "directly behind") ──────────
     // This is the primary axis: being in the same column or close

@@ -68,7 +68,7 @@ export function LayoutView() {
       lidMap[lid] = leader;
     });
     return lidMap;
-  }, [agents, config.leaderBoxAssignments, config.leaderField, selectedShift, shiftWindow]);
+  }, [agents, config.leaderBoxAssignments, selectedShift, shiftWindow]);
 
   const gridRef      = useRef<HTMLDivElement>(null);
   const [selectedLeader, setSelectedLeader] = useState('');

@@ -13,7 +13,7 @@ import type {
 import { defaultLayout } from '../data/defaultLayout';
 import { assignBoxes, assignLeaders } from '../lib/assignment/assignmentEngine';
 import { buildLeaderBoxMap } from '../lib/assignment/leaderUtils';
-import { timeToMinutes } from '../lib/utils/timeParser';
+import { timeToMinutes, timeRangesOverlap } from '../lib/utils/timeParser';
 
 const initialConfig: AppConfig = {
   leaderField: 'superior',
@@ -255,12 +255,21 @@ export const useStore = create<StoreState>()(
     },
 
     assignAgentToBox: (agentId, boxId) => {
-      set((state) => {
-        const newAssignments = new Map(state.assignments);
+      const state = get();
+      const agent = state.agents.find((a) => a.id === agentId);
+      const box = state.layout.boxes.find((b) => b.id === boxId);
+      if (agent && box) {
+        const hasOverlap = box.occupations.some((occ) =>
+          timeRangesOverlap(agent.entryTime, agent.exitTime, occ.entryTime, occ.exitTime)
+        );
+        if (hasOverlap) return;
+      }
+      set((s) => {
+        const newAssignments = new Map(s.assignments);
         newAssignments.set(agentId, boxId);
         return {
           assignments: newAssignments,
-          agents: state.agents.map((a) =>
+          agents: s.agents.map((a) =>
             a.id === agentId
               ? { ...a, boxId, assignmentStatus: a.isLocked ? 'manual-locked' : 'assigned' }
               : a

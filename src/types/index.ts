@@ -268,8 +268,8 @@ export interface SimulationState {
   id: string;
   name: string;
   timestamp: number;
-  assignments: Map<string, string>;
-  lockedAgents: Set<string>;
+  assignments: Record<string, string>;
+  lockedAgents: string[];
   config: AppConfig;
   rules: Rule[];
 }

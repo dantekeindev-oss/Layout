@@ -10,7 +10,7 @@ import type {
   ZoneRestrictionRule,
 } from '../../types';
 import { calculateAssignmentScore } from './ruleEngine';
-import { leaderNamesMatch, buildLeaderBoxMap, type LeaderBoxMap } from './leaderUtils';
+import { leaderNamesMatch, type LeaderBoxMap } from './leaderUtils';
 import { timeRangesOverlap, timeToMinutes } from '../utils/timeParser';
 
 // ─────────────────────────────────────────────
@@ -122,7 +122,9 @@ export function assignBoxes(
   const assignments = new Map<string, string>();
 
   lockedAgents.forEach((agent) => {
-    if (agent.boxId) assignments.set(agent.id, agent.boxId);
+    if (agent.boxId && boxes.some((b) => b.id === agent.boxId)) {
+      assignments.set(agent.id, agent.boxId);
+    }
   });
 
   const agentsToAssign = agents.filter((a) => !a.isLocked || !a.boxId);
@@ -141,7 +143,7 @@ export function assignBoxes(
 
     if (result.box) {
       assignments.set(agent.id, result.box.id);
-      addOccupation(result.box, agent);
+      addOccupation(result.box, agent, config.leaderField);
     } else {
       conflicts.push({
         type: 'no-space',
@@ -155,7 +157,7 @@ export function assignBoxes(
   const timeConflicts = checkTimeConflicts(assignments, agents, boxes);
   conflicts.push(...timeConflicts);
 
-  const stats = calculateAssignmentStats(assignments, agents, boxes);
+  const stats = calculateAssignmentStats(assignments, agents, boxes, config.leaderField);
 
   return { assignments, conflicts, stats, satisfiedRules: [], violatedRules: [] };
 }
@@ -236,13 +238,13 @@ function canAssignToBox(
   return true;
 }
 
-function addOccupation(box: Box, agent: Agent): void {
+function addOccupation(box: Box, agent: Agent, leaderField: AppConfig['leaderField']): void {
   box.occupations.push({
     agentId: agent.id,
     agentName: agent.nombre,
     entryTime: agent.entryTime,
     exitTime: agent.exitTime,
-    leader: agent.jefe,
+    leader: leaderField === 'jefe' ? agent.jefe : agent.superior,
     segment: agent.segmento,
   });
   box.occupations.sort((a, b) => timeToMinutes(a.entryTime) - timeToMinutes(b.entryTime));
@@ -307,7 +309,8 @@ function checkTimeConflicts(
 function calculateAssignmentStats(
   assignments: Map<string, string>,
   agents: Agent[],
-  boxes: Box[]
+  boxes: Box[],
+  leaderField: AppConfig['leaderField']
 ): AssignmentStats {
   const totalAgents = agents.length;
   const assignedAgents = assignments.size;
@@ -326,7 +329,7 @@ function calculateAssignmentStats(
   });
   boxOccupants.forEach((occupants) => { if (occupants.length > 1) reusedBoxes++; });
 
-  const fragmentationScore = calculateFragmentation(assignments, agents, boxes);
+  const fragmentationScore = calculateFragmentation(assignments, agents, boxes, leaderField);
 
   return {
     totalAgents, assignedAgents, unassignedAgents,
@@ -339,13 +342,14 @@ function calculateAssignmentStats(
 function calculateFragmentation(
   assignments: Map<string, string>,
   agents: Agent[],
-  boxes: Box[]
+  boxes: Box[],
+  leaderField: AppConfig['leaderField']
 ): number {
   const teams = new Map<string, string[]>();
   assignments.forEach((boxId, agentId) => {
     const agent = agents.find((a) => a.id === agentId);
     if (agent) {
-      const leader = agent.jefe;
+      const leader = leaderField === 'jefe' ? agent.jefe : agent.superior;
       if (!teams.has(leader)) teams.set(leader, []);
       teams.get(leader)!.push(boxId);
     }
