@@ -5,25 +5,15 @@ import type { Box, BoxOccupation } from '../../types';
 import { isFemale } from '../../lib/utils/gender';
 import { AgentAvatar } from './AgentAvatar';
 
-// Neon palette — cada zona tiene su color + versión oscura para el fondo
+// Professional SaaS palette — distinguible, no neón
 const ZONE_ACCENT: Record<string, string> = {
-  'LID 1': '#00d4ff',   // cyan neón
-  'LID 2': '#00ff88',   // verde neón
-  'LID 3': '#ffcc00',   // amarillo neón
-  'LID 4': '#bf00ff',   // purple neón
-  'LID 5': '#ff0099',   // magenta
-  'LID 6': '#ff6600',   // naranja
-  'LID 7': '#00ffff',   // cyan claro
-};
-
-const ZONE_BG: Record<string, string> = {
-  'LID 1': 'rgba(0,212,255,0.05)',
-  'LID 2': 'rgba(0,255,136,0.05)',
-  'LID 3': 'rgba(255,204,0,0.05)',
-  'LID 4': 'rgba(191,0,255,0.05)',
-  'LID 5': 'rgba(255,0,153,0.05)',
-  'LID 6': 'rgba(255,102,0,0.05)',
-  'LID 7': 'rgba(0,255,255,0.05)',
+  'LID 1': '#60a5fa',  // azul suave
+  'LID 2': '#34d399',  // verde menta
+  'LID 3': '#fbbf24',  // ámbar
+  'LID 4': '#a78bfa',  // lavanda
+  'LID 5': '#f472b6',  // rosa suave
+  'LID 6': '#fb923c',  // naranja suave
+  'LID 7': '#67e8f9',  // cyan suave
 };
 
 interface BoxCardProps {
@@ -45,8 +35,7 @@ export const BoxCard = memo(({
   const female = occ ? isFemale(occ.agentName) : false;
   const hasNext = !occ && !!box.nextOccupant;
   const isInactive = !box.activo;
-  const zoneColor = ZONE_ACCENT[box.zona] ?? '#334155';
-  const zoneBg    = ZONE_BG[box.zona]    ?? 'rgba(30,41,59,0.5)';
+  const zoneColor = ZONE_ACCENT[box.zona] ?? '#64748b';
 
   // Próximo ocupante para recambio
   const nextAfterCurrent = occ
@@ -62,149 +51,125 @@ export const BoxCard = memo(({
       <div
         onClick={onClick}
         title={`Box ${box.numero} — Fuera de servicio`}
-        className="box-card w-full h-full flex flex-col items-center justify-center rounded-xl cursor-pointer select-none"
-        style={{
-          background: '#050816',
-          border: '2px dashed rgba(239,68,68,0.25)',
-          boxShadow: isSelected ? '0 0 16px rgba(239,68,68,0.3)' : undefined,
-        }}
+        className={clsx(
+          'box-card w-full h-full flex flex-col items-center justify-center rounded-xl cursor-pointer select-none',
+          'border-2 border-dashed border-red-900/40',
+          isSelected && 'border-red-500/60',
+        )}
+        style={{ background: '#0a0a0f' }}
       >
-        <WifiOff className="w-4 h-4 mb-1" style={{ color: 'rgba(239,68,68,0.4)' }} />
-        <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: 'rgba(239,68,68,0.4)' }}>
-          Box {box.numero}
-        </span>
+        <WifiOff className="w-4 h-4 mb-1 text-red-900/60" />
+        <span className="text-[9px] font-semibold uppercase tracking-wide text-red-900/60">Box {box.numero}</span>
       </div>
     );
   }
 
-  const glowColor = isSelected
-    ? 'rgba(0,212,255,0.5)'
-    : isHighlighted
-    ? 'rgba(251,191,36,0.5)'
-    : occ
-    ? `${zoneColor}44`
-    : `${zoneColor}18`;
-
   const borderColor = isSelected
-    ? '#00d4ff'
+    ? '#6366f1'
     : isHighlighted
     ? '#fbbf24'
     : occ
-    ? `${zoneColor}bb`
-    : `${zoneColor}33`;
+    ? `${zoneColor}60`
+    : '#1e293b';
 
   return (
     <div
       onClick={onClick}
       title={occ ? `${occ.agentName} · ${occ.entryTime}–${occ.exitTime}` : `Box ${box.numero} · ${box.zona}`}
-      className={clsx('box-card w-full h-full flex flex-col rounded-xl overflow-hidden cursor-pointer select-none', occ && 'occupied')}
+      className={clsx('box-card w-full h-full flex flex-col rounded-xl overflow-hidden cursor-pointer select-none')}
       style={{
-        '--glow': glowColor,
         background: occ
-          ? isLeader
-            ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(217,119,6,0.08))'
-            : `linear-gradient(135deg, ${zoneBg}, rgba(5,8,22,0.95))`
-          : 'rgba(5,8,22,0.8)',
+          ? isLeader ? '#1c1608' : '#111118'
+          : '#0d0d14',
         border: `1px solid ${borderColor}`,
-        borderLeft: `3px solid ${borderColor}`,
-        boxShadow: occ
-          ? `0 0 ${isSelected ? '20px' : '10px'} ${glowColor}, inset 0 0 20px rgba(0,0,0,0.3)`
-          : `0 0 6px ${glowColor}`,
-        opacity: isDimmed ? 0.1 : 1,
+        borderLeft: `3px solid ${isSelected ? '#6366f1' : isHighlighted ? '#fbbf24' : zoneColor}`,
+        boxShadow: isSelected
+          ? '0 0 0 1px rgba(99,102,241,0.3), 0 4px 16px rgba(0,0,0,0.4)'
+          : isHighlighted
+          ? '0 0 0 1px rgba(251,191,36,0.2), 0 4px 16px rgba(0,0,0,0.4)'
+          : '0 1px 4px rgba(0,0,0,0.3)',
+        opacity: isDimmed ? 0.08 : 1,
         pointerEvents: isDimmed ? 'none' : 'auto',
-      } as React.CSSProperties}
+      }}
     >
-      {/* Top accent bar */}
-      <div style={{
-        height: 2,
-        background: occ
-          ? `linear-gradient(90deg, ${zoneColor}, transparent)`
-          : `linear-gradient(90deg, ${zoneColor}44, transparent)`,
-        animation: occ && isSelected ? 'glow-pulse 2s ease-in-out infinite' : undefined,
-      }} />
+      {/* Zone accent bar */}
+      <div style={{ height: 2, background: occ ? zoneColor : `${zoneColor}30` }} />
 
-      {/* Header strip */}
+      {/* Header */}
       <div className="flex items-center justify-between px-2 pt-1 pb-0.5 shrink-0"
-        style={{ borderBottom: `1px solid ${zoneColor}18` }}
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
       >
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-[12px] font-black tabular-nums leading-none" style={{ color: zoneColor, textShadow: occ ? `0 0 8px ${zoneColor}` : undefined }}>
+          <span className="text-[11px] font-bold tabular-nums leading-none text-slate-300">
             {box.numero}
           </span>
-          <span className="text-[7px] font-bold leading-none uppercase tracking-widest truncate" style={{ color: `${zoneColor}66` }}>
+          <span className="text-[8px] font-semibold leading-none truncate uppercase tracking-wide"
+            style={{ color: `${zoneColor}90` }}>
             {box.zona}
           </span>
         </div>
         {isLeader && (
-          <span className="text-[7px] font-black px-1.5 py-0.5 rounded-sm leading-none uppercase tracking-widest shrink-0 animate-badge-pop"
+          <span className="text-[7px] font-bold px-1.5 py-0.5 rounded leading-none uppercase tracking-wider shrink-0 animate-badge-pop"
             style={{
-              background: 'rgba(251,191,36,0.15)',
-              border: '1px solid rgba(251,191,36,0.5)',
+              background: 'rgba(251,191,36,0.12)',
+              border: '1px solid rgba(251,191,36,0.3)',
               color: '#fbbf24',
-              boxShadow: '0 0 8px rgba(251,191,36,0.3)',
             }}
           >
-            LID
+            LÍD
           </span>
         )}
       </div>
 
       {/* Body */}
       {occ ? (
-        <div className="flex items-center gap-1.5 flex-1 px-2 py-1 min-h-0 overflow-hidden">
+        <div className="flex items-center gap-1.5 flex-1 px-2 py-1.5 min-h-0 overflow-hidden">
           <div className="shrink-0">
             <AgentAvatar female={female} isLeader={isLeader} size={36} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-bold leading-tight truncate" style={{ color: '#f1f5f9' }} title={occ.agentName}>
+            <p className="text-[11px] font-semibold text-slate-100 leading-tight truncate" title={occ.agentName}>
               {occ.agentName.split(' ').slice(0, 2).join(' ')}
             </p>
-            <p className="text-[8px] leading-none truncate mt-0.5" style={{ color: `${zoneColor}99` }} title={occ.leader}>
+            <p className="text-[9px] leading-none truncate mt-0.5" style={{ color: `${zoneColor}80` }} title={occ.leader}>
               {occ.leader.split(' ').slice(0, 2).join(' ')}
             </p>
             {occ.segment && (
-              <p className="text-[7px] leading-none truncate mt-0.5" style={{ color: 'rgba(100,116,139,0.8)' }}>
-                {occ.segment}
-              </p>
+              <p className="text-[8px] text-slate-600 leading-none truncate mt-0.5">{occ.segment}</p>
             )}
           </div>
         </div>
       ) : hasNext ? (
         <div className="flex flex-col items-center justify-center flex-1 px-2 gap-0.5">
-          <span className="text-[7px] font-bold uppercase tracking-widest" style={{ color: 'rgba(100,116,139,0.6)' }}>
-            libre ahora
-          </span>
-          <span className="text-[12px] font-black tabular-nums" style={{ color: zoneColor, textShadow: `0 0 8px ${zoneColor}88` }}>
+          <span className="text-[8px] text-slate-600 font-medium uppercase tracking-wider">libre ahora</span>
+          <span className="text-[12px] font-bold tabular-nums" style={{ color: zoneColor }}>
             {box.nextOccupant!.entryTime}
           </span>
-          <span className="text-[8px] font-medium truncate w-full text-center" style={{ color: `${zoneColor}77` }}>
+          <span className="text-[8px] text-slate-500 truncate w-full text-center">
             {box.nextOccupant!.agentName.split(' ').slice(0, 2).join(' ')}
           </span>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center flex-1 gap-1">
-          <div className="w-4 h-4 rounded-full animate-glow-pulse" style={{
-            border: `1px solid ${zoneColor}33`,
-            boxShadow: `0 0 6px ${zoneColor}22`,
-          }} />
-          <span className="text-[8px] font-medium uppercase tracking-widest" style={{ color: `${zoneColor}33` }}>
-            libre
-          </span>
+          <div className="w-4 h-4 rounded-full border border-slate-800" />
+          <span className="text-[8px] text-slate-700 font-medium uppercase tracking-wide">libre</span>
         </div>
       )}
 
       {/* Footer */}
       {occ && (
-        <div className="px-2 py-1 shrink-0" style={{ borderTop: `1px solid ${zoneColor}18` }}>
+        <div className="px-2 py-1 shrink-0"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[8px] font-bold tabular-nums" style={{ color: `${zoneColor}88` }}>
+            <span className="text-[9px] text-slate-500 font-medium tabular-nums">
               {occ.entryTime}–{occ.exitTime}
             </span>
             {!nextAfterCurrent && (
-              <span className="text-[7px] font-black px-1.5 py-0.5 rounded-sm uppercase tracking-widest"
+              <span className="text-[7px] font-semibold px-1.5 py-0.5 rounded uppercase tracking-wide"
                 style={{
-                  background: `${zoneColor}18`,
-                  border: `1px solid ${zoneColor}44`,
+                  background: `${zoneColor}15`,
+                  border: `1px solid ${zoneColor}30`,
                   color: zoneColor,
                 }}
               >
@@ -215,15 +180,18 @@ export const BoxCard = memo(({
           {nextAfterCurrent && (
             <div className="flex items-center gap-1 mt-0.5 rounded px-1 py-0.5"
               style={{
-                background: sameTeamRecambio ? 'rgba(0,255,136,0.08)' : 'rgba(30,41,59,0.5)',
-                border: `1px solid ${sameTeamRecambio ? 'rgba(0,255,136,0.25)' : 'rgba(30,41,59,0.8)'}`,
+                background: sameTeamRecambio ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${sameTeamRecambio ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.06)'}`,
               }}
             >
-              <span className="text-[8px] font-black shrink-0" style={{ color: sameTeamRecambio ? '#00ff88' : '#334155' }}>⇄</span>
-              <span className="text-[8px] font-semibold truncate" style={{ color: sameTeamRecambio ? 'rgba(0,255,136,0.9)' : '#475569' }}>
+              <span className="text-[8px] font-bold shrink-0"
+                style={{ color: sameTeamRecambio ? '#34d399' : '#334155' }}>⇄</span>
+              <span className="text-[8px] font-medium truncate"
+                style={{ color: sameTeamRecambio ? '#34d399cc' : '#475569' }}>
                 {nextAfterCurrent.agentName.split(' ')[0]}
               </span>
-              <span className="text-[7px] tabular-nums ml-auto shrink-0" style={{ color: sameTeamRecambio ? 'rgba(0,255,136,0.6)' : '#334155' }}>
+              <span className="text-[7px] tabular-nums ml-auto shrink-0"
+                style={{ color: sameTeamRecambio ? '#34d39988' : '#334155' }}>
                 {nextAfterCurrent.entryTime}
               </span>
             </div>
@@ -233,12 +201,8 @@ export const BoxCard = memo(({
 
       {/* Multi-occupant badge */}
       {(shiftOccupationCount ?? box.occupations.length) > 1 && (
-        <div className="absolute top-0.5 right-0.5 min-w-[15px] h-[15px] text-[7px] font-black rounded-full flex items-center justify-center px-1 animate-badge-pop"
-          style={{
-            background: zoneColor,
-            color: '#050816',
-            boxShadow: `0 0 8px ${zoneColor}`,
-          }}
+        <div className="absolute top-1 right-1 min-w-[15px] h-[15px] text-[7px] font-bold rounded-full flex items-center justify-center px-1 animate-badge-pop"
+          style={{ background: zoneColor, color: '#0a0a0f' }}
         >
           {shiftOccupationCount ?? box.occupations.length}
         </div>

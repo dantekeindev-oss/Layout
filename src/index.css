@@ -5,26 +5,9 @@
 @layer base {
   * { @apply border-slate-800; }
   body {
-    background: #050816;
+    background: #0a0a0f;
     @apply text-slate-100 antialiased;
   }
-}
-
-/* ── Keyframes ─────────────────────────────────────────────── */
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.7; }
-  50%       { opacity: 1; }
-}
-
-@keyframes scan-line {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes neon-flicker {
-  0%, 95%, 100% { opacity: 1; }
-  96%           { opacity: 0.7; }
-  98%           { opacity: 0.9; }
 }
 
 @keyframes badge-pop {
@@ -33,26 +16,18 @@
   100% { transform: scale(1);   opacity: 1; }
 }
 
-.animate-glow-pulse  { animation: glow-pulse  2.5s ease-in-out infinite; }
-.animate-neon-flicker{ animation: neon-flicker 4s ease-in-out infinite; }
-.animate-badge-pop   { animation: badge-pop   0.25s cubic-bezier(.34,1.56,.64,1) both; }
+.animate-badge-pop { animation: badge-pop 0.2s cubic-bezier(.34,1.56,.64,1) both; }
 
-/* ── Box card hover glow (driven by CSS var --glow) ──────── */
 .box-card {
-  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .box-card:hover {
-  transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 0 18px var(--glow, #00d4ff55), 0 4px 20px #00000060;
-}
-.box-card.occupied:hover {
-  transform: translateY(-1px) scale(1.015);
-  box-shadow: 0 0 24px var(--glow, #00d4ff66), 0 6px 24px #00000070;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 
-/* ── Scrollbars ─────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #050816; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
 ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
@@ -63,24 +38,24 @@
            disabled:opacity-40 disabled:pointer-events-none;
   }
   .btn-primary   { @apply bg-indigo-600 text-white hover:bg-indigo-500 focus:ring-indigo-500 shadow-sm; }
-  .btn-secondary { @apply bg-slate-700 text-slate-100 hover:bg-slate-600 focus:ring-slate-500; }
-  .btn-outline   { @apply border border-slate-600 text-slate-200 bg-slate-800 hover:bg-slate-700 focus:ring-slate-500; }
+  .btn-secondary { @apply bg-slate-800 text-slate-100 hover:bg-slate-700 focus:ring-slate-500; }
+  .btn-outline   { @apply border border-slate-700 text-slate-300 bg-transparent hover:bg-slate-800 focus:ring-slate-500; }
   .btn-danger    { @apply bg-red-600 text-white hover:bg-red-500 focus:ring-red-500; }
-  .btn-ghost     { @apply bg-transparent text-slate-300 hover:bg-slate-800 focus:ring-slate-500; }
+  .btn-ghost     { @apply bg-transparent text-slate-400 hover:bg-slate-800 hover:text-slate-200 focus:ring-slate-500; }
 
-  .card       { @apply bg-slate-800 rounded-xl border border-slate-700 shadow-lg; }
-  .card-hover { @apply card hover:border-slate-500 hover:shadow-xl transition-all cursor-pointer; }
+  .card       { @apply bg-slate-900 rounded-xl border border-slate-800 shadow-lg; }
+  .card-hover { @apply card hover:border-slate-600 hover:shadow-xl transition-all cursor-pointer; }
 
   .badge         { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold; }
   .badge-primary { @apply bg-indigo-900/60 text-indigo-300 ring-1 ring-indigo-700/60; }
   .badge-success { @apply bg-emerald-900/60 text-emerald-300 ring-1 ring-emerald-700/60; }
   .badge-warning { @apply bg-amber-900/60  text-amber-300  ring-1 ring-amber-700/60; }
   .badge-danger  { @apply bg-red-900/60    text-red-300    ring-1 ring-red-700/60; }
-  .badge-gray    { @apply bg-slate-700     text-slate-300  ring-1 ring-slate-600; }
+  .badge-gray    { @apply bg-slate-800     text-slate-300  ring-1 ring-slate-700; }
 
   .input {
-    @apply block w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm
+    @apply block w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm
            text-slate-100 placeholder-slate-500
-           focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-colors;
+           focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors;
   }
 }
