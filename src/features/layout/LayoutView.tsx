@@ -22,26 +22,26 @@ const GAP = 4;
 
 type DisplayBox = Box & { shiftOccupant?: BoxOccupation };
 
-// Zone colors adapted to dark theme (more saturated, semi-transparent)
+// Neon zone colors — LID cells background
 const DARK_ZONE_COLORS: Record<string, string> = {
-  'LID 1': '#1e3a5f',
-  'LID 2': '#14532d',
-  'LID 3': '#713f12',
-  'LID 4': '#4a1d96',
-  'LID 5': '#831843',
-  'LID 6': '#7c2d12',
-  'LID 7': '#164e63',
+  'LID 1': 'rgba(0,212,255,0.12)',
+  'LID 2': 'rgba(0,255,136,0.12)',
+  'LID 3': 'rgba(255,204,0,0.12)',
+  'LID 4': 'rgba(191,0,255,0.12)',
+  'LID 5': 'rgba(255,0,153,0.12)',
+  'LID 6': 'rgba(255,102,0,0.12)',
+  'LID 7': 'rgba(0,255,255,0.12)',
 };
 
-// Accent colors matching BoxCard ZONE_ACCENT
+// Accent neon colors — matching BoxCard
 const ZONE_ACCENT_COLORS: Record<string, string> = {
-  'LID 1': '#3b82f6',
-  'LID 2': '#10b981',
-  'LID 3': '#f59e0b',
-  'LID 4': '#a855f7',
-  'LID 5': '#ec4899',
-  'LID 6': '#f97316',
-  'LID 7': '#06b6d4',
+  'LID 1': '#00d4ff',
+  'LID 2': '#00ff88',
+  'LID 3': '#ffcc00',
+  'LID 4': '#bf00ff',
+  'LID 5': '#ff0099',
+  'LID 6': '#ff6600',
+  'LID 7': '#00ffff',
 };
 
 const ZONE_BOX_RANGES: Record<string, string> = {
@@ -55,7 +55,7 @@ const ZONE_BOX_RANGES: Record<string, string> = {
 };
 
 function getDarkZoneColor(zone: string) {
-  return DARK_ZONE_COLORS[zone] || '#1e293b';
+  return DARK_ZONE_COLORS[zone] || 'rgba(30,41,59,0.5)';
 }
 
 function occOverlapsWindow(occ: BoxOccupation, wStart: number, wEnd: number) {
@@ -228,57 +228,72 @@ export function LayoutView() {
   ).join(' ');
 
   return (
-    <div className="h-full flex flex-col bg-slate-950">
+    <div className="h-full flex flex-col" style={{ background: '#050816' }}>
 
       {/* ── Toolbar ── */}
-      <div className="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center gap-3 flex-wrap shrink-0">
+      <div className="px-4 py-2.5 flex items-center gap-3 flex-wrap shrink-0"
+        style={{
+          background: 'linear-gradient(180deg, #0a0f2e 0%, #050816 100%)',
+          borderBottom: '1px solid rgba(0,212,255,0.15)',
+        }}
+      >
 
         {/* Counters */}
-        <div className="flex items-center gap-3 mr-2">
-          <div className="text-right">
-            <span className="text-lg font-bold text-white tabular-nums">{occupiedInShift}</span>
-            <span className="text-slate-500 text-sm">/{totalBoxes}</span>
+        <div className="flex items-center gap-2 mr-2">
+          <div className="text-right leading-none">
+            <span className="text-xl font-black tabular-nums" style={{ color: '#00d4ff', textShadow: '0 0 12px rgba(0,212,255,0.6)' }}>
+              {occupiedInShift}
+            </span>
+            <span className="text-sm font-bold" style={{ color: 'rgba(0,212,255,0.35)' }}>/{totalBoxes}</span>
           </div>
-          <span className="text-xs text-slate-500 font-medium leading-tight">boxes<br/>ocupados</span>
+          <span className="text-[9px] font-bold uppercase tracking-widest leading-tight" style={{ color: 'rgba(100,116,139,0.6)' }}>
+            boxes<br/>ocupados
+          </span>
           {excludedTeamBoxes > 0 && (
-            <span className="text-xs text-red-400 font-medium leading-tight">
-              ({excludedTeamBoxes} excluidos)
+            <span className="text-[9px] font-bold" style={{ color: '#ff0099' }}>
+              ({excludedTeamBoxes} excl.)
             </span>
           )}
         </div>
 
-        <div className="w-px h-6 bg-slate-700" />
+        <div className="w-px h-5" style={{ background: 'rgba(0,212,255,0.15)' }} />
 
         {/* Shift pills */}
-        <div className="flex items-center gap-1 bg-slate-800 rounded-lg p-1">
+        <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,212,255,0.1)' }}>
           {Object.entries(SHIFT_WINDOWS).map(([key, { label }]) => (
             <button
               key={key}
               onClick={() => useStore.getState().setUiState({ selectedShift: key as ShiftType | 'all' })}
-              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
-                selectedShift === key
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className="px-3 py-1 rounded-md text-xs font-bold transition-all"
+              style={selectedShift === key ? {
+                background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(124,58,237,0.2))',
+                border: '1px solid rgba(0,212,255,0.5)',
+                color: '#00d4ff',
+                boxShadow: '0 0 10px rgba(0,212,255,0.2)',
+              } : {
+                color: 'rgba(100,116,139,0.7)',
+                border: '1px solid transparent',
+              }}
             >
               {label}
             </button>
           ))}
         </div>
 
-        <div className="w-px h-6 bg-slate-700" />
+        <div className="w-px h-5" style={{ background: 'rgba(0,212,255,0.15)' }} />
 
         {/* Leader filter */}
         <div className="relative flex items-center gap-1.5">
           <button
             onClick={() => setLeaderOpen((o) => !o)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-              selectedLeader && leaderMode === 'highlight'
-                ? 'bg-amber-500/10 border-amber-500/50 text-amber-300'
-                : selectedLeader && leaderMode === 'exclude'
-                ? 'bg-red-500/10 border-red-500/50 text-red-300'
-                : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500'
-            }`}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style={selectedLeader && leaderMode === 'highlight' ? {
+              background: 'rgba(255,204,0,0.1)', border: '1px solid rgba(255,204,0,0.4)', color: '#ffcc00',
+            } : selectedLeader && leaderMode === 'exclude' ? {
+              background: 'rgba(255,0,153,0.1)', border: '1px solid rgba(255,0,153,0.4)', color: '#ff0099',
+            } : {
+              background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,212,255,0.15)', color: 'rgba(148,163,184,0.7)',
+            }}
           >
             <span className="max-w-[160px] truncate">
               {selectedLeader
@@ -298,38 +313,37 @@ export function LayoutView() {
           )}
 
           {leaderOpen && (
-            <div className="absolute left-0 top-full mt-1 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+            <div className="absolute left-0 top-full mt-1 w-72 rounded-xl shadow-2xl z-50 overflow-hidden"
+              style={{ background: '#0a0f2e', border: '1px solid rgba(0,212,255,0.2)', boxShadow: '0 0 30px rgba(0,212,255,0.1)' }}
+            >
               {/* Mode toggle */}
-              <div className="p-2 border-b border-slate-700 bg-slate-900/60">
-                <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1.5 px-1">Modo de filtro</p>
+              <div className="p-2" style={{ borderBottom: '1px solid rgba(0,212,255,0.1)' }}>
+                <p className="text-[9px] font-bold uppercase tracking-widest mb-1.5 px-1" style={{ color: 'rgba(0,212,255,0.4)' }}>Modo de filtro</p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setLeaderMode('highlight')}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      leaderMode === 'highlight'
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'
-                    }`}
-                  >
-                    Resaltar equipo
-                  </button>
+                    className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all"
+                    style={leaderMode === 'highlight' ? {
+                      background: 'rgba(255,204,0,0.15)', border: '1px solid rgba(255,204,0,0.4)', color: '#ffcc00',
+                    } : { color: 'rgba(100,116,139,0.6)', border: '1px solid transparent' }}
+                  >Resaltar</button>
                   <button
                     onClick={() => setLeaderMode('exclude')}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      leaderMode === 'exclude'
-                        ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'
-                    }`}
-                  >
-                    Excluir en vista
-                  </button>
+                    className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all"
+                    style={leaderMode === 'exclude' ? {
+                      background: 'rgba(255,0,153,0.15)', border: '1px solid rgba(255,0,153,0.4)', color: '#ff0099',
+                    } : { color: 'rgba(100,116,139,0.6)', border: '1px solid transparent' }}
+                  >Excluir</button>
                 </div>
               </div>
 
               {/* Leader list */}
               <div className="p-1 max-h-64 overflow-y-auto">
                 <button
-                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${!selectedLeader ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-700'}`}
+                  className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all"
+                  style={!selectedLeader ? {
+                    background: 'rgba(0,212,255,0.15)', border: '1px solid rgba(0,212,255,0.3)', color: '#00d4ff',
+                  } : { color: 'rgba(148,163,184,0.7)' }}
                   onClick={() => { setSelectedLeader(''); setLeaderOpen(false); }}
                 >
                   Todos los líderes
@@ -337,17 +351,18 @@ export function LayoutView() {
                 {leaderNames.map((l) => (
                   <button
                     key={l}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
-                      selectedLeader === l
-                        ? leaderMode === 'exclude' ? 'bg-red-600/80 text-white' : 'bg-amber-500/80 text-slate-900'
-                        : 'text-slate-300 hover:bg-slate-700'
-                    }`}
+                    className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-between"
+                    style={selectedLeader === l ? {
+                      background: leaderMode === 'exclude' ? 'rgba(255,0,153,0.15)' : 'rgba(255,204,0,0.15)',
+                      color: leaderMode === 'exclude' ? '#ff0099' : '#ffcc00',
+                      border: `1px solid ${leaderMode === 'exclude' ? 'rgba(255,0,153,0.3)' : 'rgba(255,204,0,0.3)'}`,
+                    } : { color: 'rgba(148,163,184,0.7)', border: '1px solid transparent' }}
                     onClick={() => { setSelectedLeader(l); setLeaderOpen(false); }}
                   >
                     <span>{l}</span>
                     {selectedLeader === l && (
-                      <span className="text-[9px] font-bold opacity-80 uppercase tracking-wide ml-2">
-                        {leaderMode === 'exclude' ? 'ocultando' : 'resaltando'}
+                      <span className="text-[8px] font-black uppercase tracking-widest ml-2 opacity-80">
+                        {leaderMode === 'exclude' ? 'excl.' : 'activo'}
                       </span>
                     )}
                   </button>
@@ -357,90 +372,90 @@ export function LayoutView() {
           )}
         </div>
 
-        <div className="w-px h-6 bg-slate-700" />
+        <div className="w-px h-5" style={{ background: 'rgba(0,212,255,0.15)' }} />
 
         {/* Leader Field Quick Toggle */}
-        <div className="flex items-center gap-1 bg-slate-800 rounded-lg p-1">
-          <button
-            onClick={() => setConfig({ leaderField: 'superior' })}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              config.leaderField === 'superior'
-                ? 'bg-indigo-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            title="Usar SUPERIOR (Jerarquía superior)"
-          >
-            Super
-          </button>
-          <button
-            onClick={() => setConfig({ leaderField: 'jefe' })}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              config.leaderField === 'jefe'
-                ? 'bg-indigo-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            title="Usar JEFE (Reporta directo)"
-          >
-            Jefe
-          </button>
+        <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,212,255,0.1)' }}>
+          {(['superior', 'jefe'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setConfig({ leaderField: f })}
+              className="px-3 py-1 rounded-md text-xs font-bold transition-all capitalize"
+              style={config.leaderField === f ? {
+                background: 'linear-gradient(135deg, rgba(191,0,255,0.2), rgba(0,212,255,0.2))',
+                border: '1px solid rgba(191,0,255,0.5)',
+                color: '#bf00ff',
+                boxShadow: '0 0 8px rgba(191,0,255,0.2)',
+              } : { color: 'rgba(100,116,139,0.6)', border: '1px solid transparent' }}
+            >
+              {f === 'superior' ? 'Super' : 'Jefe'}
+            </button>
+          ))}
         </div>
 
         <div className="flex-1" />
 
         {/* Zoom */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setZoom(Math.max(0.4, zoom - 0.1))}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <span className="text-xs font-semibold text-slate-400 w-10 text-center tabular-nums">
+        <div className="flex items-center gap-0.5">
+          {[
+            { icon: <ZoomOut className="w-3.5 h-3.5" />, action: () => setZoom(Math.max(0.4, zoom - 0.1)) },
+            { icon: <ZoomIn  className="w-3.5 h-3.5" />, action: () => setZoom(Math.min(2, zoom + 0.1)) },
+            { icon: <RotateCcw className="w-3.5 h-3.5" />, action: () => setZoom(1) },
+          ].map((btn, i) => (
+            <button key={i} onClick={btn.action}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ color: 'rgba(100,116,139,0.6)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#00d4ff'; e.currentTarget.style.background = 'rgba(0,212,255,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(100,116,139,0.6)'; e.currentTarget.style.background = 'transparent'; }}
+            >
+              {btn.icon}
+            </button>
+          ))}
+          <span className="text-[10px] font-black tabular-nums w-9 text-center" style={{ color: 'rgba(0,212,255,0.5)' }}>
             {Math.round(zoom * 100)}%
           </span>
-          <button
-            onClick={() => setZoom(Math.min(2, zoom + 0.1))}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setZoom(1)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
         </div>
 
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-40 transition-all shadow-sm"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all disabled:opacity-40"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(124,58,237,0.2))',
+            border: '1px solid rgba(0,212,255,0.4)',
+            color: '#00d4ff',
+            boxShadow: '0 0 12px rgba(0,212,255,0.15)',
+          }}
         >
           <Download className="w-3.5 h-3.5" />
-          {exporting ? 'Exportando…' : selectedLeader ? `Exportar — ${selectedLeader.split(' ')[0]}` : 'Exportar imagen'}
+          {exporting ? 'Exportando…' : selectedLeader ? `Export — ${selectedLeader.split(' ')[0]}` : 'Exportar'}
         </button>
       </div>
 
       {/* ── Leader banner ── */}
       {selectedLeader && (
-        <div className={`border-b px-5 py-2 flex items-center gap-3 ${
-          leaderMode === 'exclude'
-            ? 'bg-red-500/10 border-red-500/20'
-            : 'bg-amber-500/10 border-amber-500/20'
-        }`}>
-          <div className={`w-2 h-2 rounded-full animate-pulse ${leaderMode === 'exclude' ? 'bg-red-400' : 'bg-amber-400'}`} />
-          <span className={`text-xs font-semibold ${leaderMode === 'exclude' ? 'text-red-300' : 'text-amber-300'}`}>
+        <div className="px-5 py-1.5 flex items-center gap-3"
+          style={{
+            background: leaderMode === 'exclude' ? 'rgba(255,0,153,0.08)' : 'rgba(255,204,0,0.08)',
+            borderBottom: `1px solid ${leaderMode === 'exclude' ? 'rgba(255,0,153,0.2)' : 'rgba(255,204,0,0.2)'}`,
+          }}
+        >
+          <div className="w-1.5 h-1.5 rounded-full animate-glow-pulse"
+            style={{ background: leaderMode === 'exclude' ? '#ff0099' : '#ffcc00', boxShadow: `0 0 6px ${leaderMode === 'exclude' ? '#ff0099' : '#ffcc00'}` }}
+          />
+          <span className="text-xs font-bold" style={{ color: leaderMode === 'exclude' ? '#ff0099' : '#ffcc00' }}>
             {leaderMode === 'exclude'
-              ? <>Vista sin equipo: <strong>{selectedLeader}</strong> — <span className="text-red-400">({excludedAgentIds.size} agentes filtrados)</span></>
-              : <>Resaltando equipo de <strong>{selectedLeader}</strong></>
+              ? <>Vista sin equipo: <strong>{selectedLeader}</strong> — {excludedAgentIds.size} agentes filtrados</>
+              : <>Equipo: <strong>{selectedLeader}</strong></>
             }
           </span>
-          <button
-            onClick={() => setSelectedLeader('')}
-            className="ml-auto text-xs text-slate-500 hover:text-slate-300 transition-colors"
+          <button onClick={() => setSelectedLeader('')}
+            className="ml-auto text-[10px] font-bold uppercase tracking-widest transition-all"
+            style={{ color: 'rgba(100,116,139,0.5)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#00d4ff'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(100,116,139,0.5)'; }}
           >
-            Limpiar filtro
+            limpiar ×
           </button>
         </div>
       )}
@@ -463,18 +478,19 @@ export function LayoutView() {
               transform: `scale(${zoom})`,
               transformOrigin: 'top left',
               width: naturalW,
-              backgroundColor: '#0f172a',
+              background: 'linear-gradient(135deg, #050816 0%, #080d1e 100%)',
               borderRadius: 16,
               padding: 16,
+              border: '1px solid rgba(0,212,255,0.08)',
             }}
           >
             {/* Header info for export */}
             {selectedLeader && (
-              <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #334155' }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: leaderMode === 'exclude' ? '#f87171' : '#fbbf24' }}>
+              <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,212,255,0.1)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 13, fontWeight: 900, color: leaderMode === 'exclude' ? '#ff0099' : '#ffcc00', textShadow: leaderMode === 'exclude' ? '0 0 10px #ff009966' : '0 0 10px #ffcc0066' }}>
                   {leaderMode === 'exclude' ? `Vista sin equipo: ${selectedLeader}` : `Equipo: ${selectedLeader}`}
                 </span>
-                <span style={{ fontSize: 11, color: '#64748b', marginLeft: 12 }}>
+                <span style={{ fontSize: 10, color: 'rgba(0,212,255,0.4)', fontWeight: 700, letterSpacing: '0.1em' }}>
                   {SHIFT_WINDOWS[selectedShift]?.label ?? ''}
                 </span>
               </div>
@@ -516,7 +532,8 @@ export function LayoutView() {
 
                 /* LID cell — leader's physical seat */
                 if (cell.type === 'lid') {
-                  const zc = getDarkZoneColor(cell.label);
+                  const neonColor = ZONE_ACCENT_COLORS[cell.label] ?? '#00d4ff';
+                  const bgColor   = getDarkZoneColor(cell.label);
                   const isSelected = ui.selectedBoxId === cell.id;
                   const lidOcc = (cell as DisplayBox).shiftOccupant;
                   const shiftOccupations = cell.occupations.filter((o) => occOverlapsWindow(o, shiftWindow.start, shiftWindow.end));
@@ -527,31 +544,36 @@ export function LayoutView() {
                       onClick={() => selectBox(ui.selectedBoxId === cell.id ? undefined : cell.id)}
                       style={{
                         gridRow: cell.fila, gridColumn: cell.columna,
-                        height: CELL_H, backgroundColor: zc,
+                        height: CELL_H,
+                        background: `linear-gradient(135deg, ${bgColor}, rgba(5,8,22,0.9))`,
                         borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', position: 'relative',
-                        border: isSelected ? '2px solid #818cf8' : '2px solid rgba(255,255,255,0.12)',
-                        boxShadow: isSelected ? '0 0 0 1px #818cf8' : undefined,
+                        border: `1px solid ${isSelected ? neonColor : `${neonColor}44`}`,
+                        borderLeft: `3px solid ${neonColor}`,
+                        boxShadow: isSelected
+                          ? `0 0 20px ${neonColor}66, inset 0 0 15px rgba(0,0,0,0.5)`
+                          : `0 0 10px ${neonColor}22`,
+                        transition: 'all 0.15s ease',
                       }}
                     >
-                      <span style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: 11, fontWeight: 900, color: neonColor, letterSpacing: '0.1em', textTransform: 'uppercase', textShadow: `0 0 8px ${neonColor}` }}>
                         {cell.label}
                       </span>
                       {lidOcc ? (
-                        <span style={{ fontSize: 9, fontWeight: 700, color: '#fbbf24', marginTop: 2, maxWidth: '90%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: '#fbbf24', marginTop: 3, maxWidth: '90%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', textShadow: '0 0 6px rgba(251,191,36,0.6)' }}>
                           {lidOcc.agentName.split(' ')[0]}
                         </span>
                       ) : (
-                        <span style={{ fontSize: 8, color: '#475569', marginTop: 2 }}>Libre</span>
+                        <span style={{ fontSize: 8, color: `${neonColor}44`, marginTop: 3, fontWeight: 700, letterSpacing: '0.1em' }}>LIBRE</span>
                       )}
-                      {/* Badge if multiple leaders share this LID today */}
                       {multipleLeaders && (
                         <div style={{
-                          position: 'absolute', top: 3, right: 3,
+                          position: 'absolute', top: 4, right: 4,
                           minWidth: 14, height: 14,
-                          backgroundColor: '#4f46e5', color: 'white',
-                          fontSize: 8, fontWeight: 700,
+                          background: neonColor, color: '#050816',
+                          fontSize: 8, fontWeight: 900,
                           borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px',
+                          boxShadow: `0 0 8px ${neonColor}`,
                         }}>
                           {shiftOccupations.length}
                         </div>
@@ -596,32 +618,34 @@ export function LayoutView() {
             </div>
 
             {/* Legend */}
-            <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(0,212,255,0.08)' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {layout.zones.map((zone) => {
                   const accent = ZONE_ACCENT_COLORS[zone.name] ?? '#475569';
                   const range  = ZONE_BOX_RANGES[zone.name] ?? '';
                   return (
                     <div key={zone.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      backgroundColor: '#0f172a', border: `1px solid ${accent}30`,
-                      borderLeft: `3px solid ${accent}`, borderRadius: 6, padding: '4px 8px',
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      background: `${accent}0d`,
+                      border: `1px solid ${accent}30`,
+                      borderLeft: `3px solid ${accent}`,
+                      borderRadius: 6, padding: '3px 8px',
                     }}>
                       <div>
-                        <div style={{ fontSize: 10, color: accent, fontWeight: 700, lineHeight: 1 }}>{zone.name}</div>
-                        <div style={{ fontSize: 8, color: '#475569', fontWeight: 500, marginTop: 2 }}>{range}</div>
+                        <div style={{ fontSize: 9, color: accent, fontWeight: 900, lineHeight: 1, letterSpacing: '0.05em', textShadow: `0 0 6px ${accent}66` }}>{zone.name}</div>
+                        <div style={{ fontSize: 7, color: `${accent}55`, fontWeight: 600, marginTop: 2 }}>{range}</div>
                       </div>
                     </div>
                   );
                 })}
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  backgroundColor: '#0f172a', border: '1px solid #d9770630',
-                  borderLeft: '3px solid #d97706', borderRadius: 6, padding: '4px 8px',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.3)',
+                  borderLeft: '3px solid #fbbf24', borderRadius: 6, padding: '3px 8px',
                 }}>
                   <div>
-                    <div style={{ fontSize: 10, color: '#d97706', fontWeight: 700, lineHeight: 1 }}>Líder</div>
-                    <div style={{ fontSize: 8, color: '#475569', fontWeight: 500, marginTop: 2 }}>Jefe de equipo</div>
+                    <div style={{ fontSize: 9, color: '#fbbf24', fontWeight: 900, lineHeight: 1, textShadow: '0 0 6px rgba(251,191,36,0.6)' }}>LÍD</div>
+                    <div style={{ fontSize: 7, color: 'rgba(251,191,36,0.4)', fontWeight: 600, marginTop: 2 }}>Jefe equipo</div>
                   </div>
                 </div>
               </div>

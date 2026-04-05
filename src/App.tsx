@@ -26,23 +26,48 @@ export function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950">
+    <div className="h-screen flex flex-col" style={{ background: '#050816' }}>
       {/* ── Top navbar ── */}
-      <header className="h-14 shrink-0 bg-slate-900 border-b border-slate-800 px-5 flex items-center justify-between shadow-xl">
+      <header className="h-14 shrink-0 px-5 flex items-center justify-between relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(90deg, #050816 0%, #0a0f2e 50%, #050816 100%)',
+          borderBottom: '1px solid rgba(0,212,255,0.2)',
+          boxShadow: '0 1px 20px rgba(0,212,255,0.08)',
+        }}
+      >
+        {/* scan line animation */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.04) 50%, transparent 100%)',
+            animation: 'scan-line 4s linear infinite',
+          }} />
+        </div>
+
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
-            <Layers className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, #00d4ff22, #7c3aed44)',
+              border: '1px solid rgba(0,212,255,0.4)',
+              boxShadow: '0 0 12px rgba(0,212,255,0.3)',
+            }}
+          >
+            <Layers className="w-4 h-4" style={{ color: '#00d4ff' }} />
           </div>
           <div className="leading-none">
-            <span className="text-sm font-bold text-white tracking-tight">Box Assignment</span>
-            <span className="block text-[10px] text-slate-500 font-medium">Sistema de Asignación</span>
+            <span className="text-sm font-bold tracking-tight animate-neon-flicker" style={{ color: '#00d4ff', textShadow: '0 0 10px rgba(0,212,255,0.6)' }}>
+              Box Assignment
+            </span>
+            <span className="block text-[10px] font-medium" style={{ color: 'rgba(0,212,255,0.4)' }}>
+              Sistema de Asignación
+            </span>
           </div>
         </div>
 
         {/* Nav */}
         {agents.length > 0 && (
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 relative z-10">
             {[
               { view: 'layout' as ViewType, icon: <LayoutGrid className="w-4 h-4" />, label: 'Layout' },
               { view: 'table'  as ViewType, icon: <Table className="w-4 h-4" />,       label: 'Tabla' },
@@ -52,11 +77,17 @@ export function App() {
               <button
                 key={view}
                 onClick={() => setUiState({ currentView: view })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  currentView === view
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-900/50'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                }`}
+                style={currentView === view ? {
+                  background: 'linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))',
+                  border: '1px solid rgba(0,212,255,0.4)',
+                  color: '#00d4ff',
+                  boxShadow: '0 0 10px rgba(0,212,255,0.2)',
+                } : {
+                  background: 'transparent',
+                  border: '1px solid transparent',
+                  color: 'rgba(148,163,184,0.7)',
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:border-cyan-800 hover:text-slate-200"
               >
                 {icon}
                 {label}
@@ -69,7 +100,19 @@ export function App() {
         {agents.length > 0 && (
           <button
             onClick={() => setUiState({ currentView: 'upload' })}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all border border-slate-700"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all relative z-10"
+            style={{
+              border: '1px solid rgba(148,163,184,0.2)',
+              color: 'rgba(148,163,184,0.6)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(0,212,255,0.3)';
+              e.currentTarget.style.color = '#00d4ff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(148,163,184,0.2)';
+              e.currentTarget.style.color = 'rgba(148,163,184,0.6)';
+            }}
           >
             <Upload className="w-3.5 h-3.5" />
             Nueva nómina
