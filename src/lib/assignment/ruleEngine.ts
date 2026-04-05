@@ -391,6 +391,16 @@ export function calculateAssignmentScore(
     }
   }
 
+  // ── Recambio de máquina ──────────────────────────────────────────────────
+  // Si el box ya tiene ocupantes de MI equipo en otro turno → bonus fuerte:
+  // consolidar recambios del mismo equipo en el mismo box reduce fragmentación
+  // y facilita la supervisión del líder.
+  // Si ya tiene ocupantes de OTRO equipo → penalización suave: evitar mezclas.
+  const sameTeamOccupants  = box.occupations.filter((o) => o.leader === teamLeaderName).length;
+  const otherTeamOccupants = box.occupations.filter((o) => o.leader && o.leader !== teamLeaderName).length;
+  if (sameTeamOccupants > 0)  score += 35;
+  else if (otherTeamOccupants > 0) score -= 10;
+
   const evaluations = evaluateRules(
     agent, box, rules, config, currentAssignments, allAgents, leaderBoxMap, allBoxes
   );

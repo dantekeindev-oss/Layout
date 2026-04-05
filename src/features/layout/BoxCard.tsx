@@ -36,6 +36,15 @@ export const BoxCard = memo(({
   const isInactive = !box.activo;
   const zoneColor = ZONE_ACCENT[box.zona] ?? '#475569';
 
+  // Próximo ocupante en este box (recambio de máquina)
+  const nextAfterCurrent = occ
+    ? (() => {
+        const idx = box.occupations.findIndex((o) => o.agentId === occ.agentId);
+        return idx >= 0 && idx < box.occupations.length - 1 ? box.occupations[idx + 1] : undefined;
+      })()
+    : undefined;
+  const sameTeamRecambio = !!(nextAfterCurrent && nextAfterCurrent.leader === occ?.leader);
+
   if (isInactive) {
     return (
       <div
@@ -99,40 +108,69 @@ export const BoxCard = memo(({
       {occ ? (
         <div className="flex items-center gap-2 flex-1 px-2 py-1.5 min-h-0 overflow-hidden">
           <div className="shrink-0">
-            <AgentAvatar female={female} isLeader={isLeader} size={42} />
+            <AgentAvatar female={female} isLeader={isLeader} size={38} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] font-bold text-slate-100 leading-tight truncate" title={occ.agentName}>
               {occ.agentName.split(' ').slice(0, 2).join(' ')}
             </p>
-            <p className="text-[9px] text-slate-400 leading-tight truncate mt-0.5" title={occ.leader}>
+            <p className="text-[9px] text-slate-400 leading-none truncate mt-0.5" title={occ.leader}>
               {occ.leader.split(' ').slice(0, 2).join(' ')}
             </p>
+            {occ.segment && (
+              <p className="text-[8px] text-slate-600 leading-none truncate mt-0.5">{occ.segment}</p>
+            )}
           </div>
         </div>
       ) : hasNext ? (
         <div className="flex flex-col items-center justify-center flex-1 px-2 gap-0.5">
-          <span className="text-[9px] text-amber-400 font-semibold">Libre desde</span>
-          <span className="text-[13px] font-bold text-amber-300">{box.nextOccupant!.entryTime}</span>
-          <span className="text-[9px] text-slate-500 truncate w-full text-center">
-            {box.nextOccupant!.agentName.split(' ')[0]}
+          <span className="text-[8px] text-slate-500 font-semibold uppercase tracking-wider">Libre ahora</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-[11px] font-bold text-amber-300">{box.nextOccupant!.entryTime}</span>
+            <span className="text-[8px] text-slate-500">entrada</span>
+          </div>
+          <span className="text-[9px] text-amber-400/80 font-medium truncate w-full text-center">
+            {box.nextOccupant!.agentName.split(' ').slice(0, 2).join(' ')}
           </span>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center flex-1">
-          <span className="text-[10px] text-slate-600 font-medium">Disponible</span>
+        <div className="flex flex-col items-center justify-center flex-1 gap-1">
+          <div className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+          </div>
+          <span className="text-[9px] text-slate-700 font-medium">Disponible</span>
         </div>
       )}
 
       {/* ── Footer ── */}
       {occ && (
-        <div className="flex items-center justify-between px-2 py-1 bg-slate-900/60 border-t border-slate-700/50 shrink-0">
-          <span className="text-[9px] text-slate-400 font-medium leading-none tabular-nums">
-            {occ.entryTime}–{occ.exitTime}
-          </span>
-          <span className="text-[8px] bg-emerald-500/20 text-emerald-400 border border-emerald-600/40 font-bold px-1.5 py-0.5 rounded-full leading-none">
-            Ocupado
-          </span>
+        <div className="px-2 py-1 bg-slate-900/60 border-t border-slate-700/50 shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] text-slate-400 font-medium tabular-nums">
+              {occ.entryTime}–{occ.exitTime}
+            </span>
+            {!nextAfterCurrent && (
+              <span className="text-[8px] bg-emerald-500/20 text-emerald-400 border border-emerald-600/40 font-bold px-1.5 py-0.5 rounded-full leading-none">
+                Activo
+              </span>
+            )}
+          </div>
+          {nextAfterCurrent && (
+            <div className={clsx(
+              'flex items-center gap-1 mt-0.5 rounded px-1 py-0.5',
+              sameTeamRecambio ? 'bg-emerald-900/30' : 'bg-slate-800/60',
+            )}>
+              <span className={clsx('text-[8px] font-bold shrink-0', sameTeamRecambio ? 'text-emerald-400' : 'text-slate-500')}>
+                ⇄
+              </span>
+              <span className={clsx('text-[8px] font-semibold truncate', sameTeamRecambio ? 'text-emerald-300' : 'text-slate-400')}>
+                {nextAfterCurrent.agentName.split(' ')[0]}
+              </span>
+              <span className={clsx('text-[8px] tabular-nums ml-auto shrink-0', sameTeamRecambio ? 'text-emerald-500' : 'text-slate-600')}>
+                {nextAfterCurrent.entryTime}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
