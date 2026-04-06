@@ -478,7 +478,7 @@ export function LayoutView() {
                       }}
                     >
                       <div style={{ flex: 1, height: 1, background: '#c8c2b5' }} />
-                      <span style={{ fontSize: 8, color: '#b5ae a4', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap', color: '#a8a29e' }}>
+                      <span style={{ fontSize: 8, color: '#a8a29e', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                         pasillo
                       </span>
                       <div style={{ flex: 1, height: 1, background: '#c8c2b5' }} />
