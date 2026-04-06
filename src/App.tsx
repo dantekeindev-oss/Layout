@@ -92,17 +92,17 @@ export function App() {
 
 function RulesView() {
   return (
-    <div className="h-full flex bg-slate-950">
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white">Reglas de Asignación</h2>
-            <p className="text-slate-400 mt-1 text-sm">Configura cómo se asignan los agentes a los boxes.</p>
+    <div style={{ height: '100%', display: 'flex', background: '#f2ede4' }}>
+      <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>Reglas de Asignación</h2>
+            <p style={{ color: '#a8a29e', marginTop: 6, fontSize: 13, margin: '6px 0 0' }}>Configura cómo se asignan los agentes a los boxes.</p>
           </div>
           <RulesPanel />
         </div>
       </div>
-      <div className="w-80 border-l border-slate-800 bg-slate-900 p-4 overflow-y-auto">
+      <div style={{ width: 296, borderLeft: '1px solid #d4cfc5', background: '#ede8de', padding: 16, overflowY: 'auto' }}>
         <StatsPanel />
       </div>
     </div>
@@ -111,17 +111,17 @@ function RulesView() {
 
 function ConfigView() {
   return (
-    <div className="h-full flex bg-slate-950">
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white">Configuración</h2>
-            <p className="text-slate-400 mt-1 text-sm">Parámetros generales del sistema de asignación.</p>
+    <div style={{ height: '100%', display: 'flex', background: '#f2ede4' }}>
+      <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto' }}>
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>Configuración</h2>
+            <p style={{ color: '#a8a29e', marginTop: 6, fontSize: 13, margin: '6px 0 0' }}>Parámetros generales del sistema de asignación.</p>
           </div>
           <ConfigPanel />
         </div>
       </div>
-      <div className="w-80 border-l border-slate-800 bg-slate-900 p-4 overflow-y-auto">
+      <div style={{ width: 296, borderLeft: '1px solid #d4cfc5', background: '#ede8de', padding: 16, overflowY: 'auto' }}>
         <StatsPanel />
       </div>
     </div>
