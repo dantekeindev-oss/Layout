@@ -26,19 +26,19 @@ export function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: '#0a0a0f' }}>
+    <div className="h-screen flex flex-col" style={{ background: '#f2ede4' }}>
       {/* ── Top navbar ── */}
-      <header className="h-14 shrink-0 px-5 flex items-center justify-between"
-        style={{ background: '#111118', borderBottom: '1px solid #1e1e2e' }}
+      <header className="h-13 shrink-0 px-6 flex items-center justify-between"
+        style={{ background: '#1a1714', borderBottom: '1px solid #2c2520' }}
       >
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm">
-            <Layers className="w-4 h-4 text-white" />
+          <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: '#f2ede4' }}>
+            <Layers className="w-4 h-4" style={{ color: '#1a1714' }} />
           </div>
           <div className="leading-none">
             <span className="text-sm font-semibold text-white tracking-tight">Box Assignment</span>
-            <span className="block text-[10px] text-slate-500 font-medium">Sistema de Asignación</span>
+            <span className="block text-[10px] font-normal" style={{ color: 'rgba(255,255,255,0.35)' }}>Sistema de Asignación</span>
           </div>
         </div>
 
@@ -46,18 +46,18 @@ export function App() {
         {agents.length > 0 && (
           <nav className="flex items-center gap-0.5">
             {[
-              { view: 'layout' as ViewType, icon: <LayoutGrid className="w-4 h-4" />, label: 'Layout' },
-              { view: 'table'  as ViewType, icon: <Table className="w-4 h-4" />,       label: 'Tabla' },
-              { view: 'rules'  as ViewType, icon: <Settings className="w-4 h-4" />,    label: 'Reglas' },
-              { view: 'config' as ViewType, icon: <BarChart3 className="w-4 h-4" />,   label: 'Config' },
+              { view: 'layout' as ViewType, icon: <LayoutGrid className="w-3.5 h-3.5" />, label: 'Layout' },
+              { view: 'table'  as ViewType, icon: <Table className="w-3.5 h-3.5" />,       label: 'Tabla' },
+              { view: 'rules'  as ViewType, icon: <Settings className="w-3.5 h-3.5" />,    label: 'Reglas' },
+              { view: 'config' as ViewType, icon: <BarChart3 className="w-3.5 h-3.5" />,   label: 'Config' },
             ].map(({ view, icon, label }) => (
               <button
                 key={view}
                 onClick={() => setUiState({ currentView: view })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   currentView === view
-                    ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-600/30'
-                    : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
                 }`}
               >
                 {icon}
@@ -67,11 +67,14 @@ export function App() {
           </nav>
         )}
 
-        {/* Right actions */}
+        {/* Right */}
         {agents.length > 0 && (
           <button
             onClick={() => setUiState({ currentView: 'upload' })}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-200 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700 transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+            style={{ color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
           >
             <Upload className="w-3.5 h-3.5" />
             Nueva nómina
