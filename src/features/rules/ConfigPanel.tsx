@@ -1,21 +1,20 @@
 import { useMemo } from 'react';
-import { Settings, User as UserIcon, CheckCircle, Shield, Users, Layers, X, RotateCcw, Trash2, Eye, EyeOff, Clock, AlertTriangle } from 'lucide-react';
+import { Settings, User as UserIcon, CheckCircle, Shield, Users, Layers, X, RotateCcw, Eye, EyeOff, Clock, AlertTriangle } from 'lucide-react';
 import { useStore } from '../../store';
-import { Card, CardBody, CardHeader, Select, Button } from '../../components/ui';
+import { Select, Button } from '../../components/ui';
 import type { AppConfig } from '../../types';
 import { timeToMinutes } from '../../lib/utils/timeParser';
 
 const SHIFT_WINDOWS = [
-  { key: 'morning',   label: 'Mañana',   start: 360, end: 660  },  // 06:00–11:00
-  { key: 'midday',    label: 'Mediodía', start: 720, end: 780  },  // 12:00–13:00
-  { key: 'afternoon', label: 'Tarde',    start: 840, end: 1440 },  // 14:00–00:00
+  { key: 'morning',   label: 'Mañana',   start: 360, end: 660  },
+  { key: 'midday',    label: 'Mediodía', start: 720, end: 780  },
+  { key: 'afternoon', label: 'Tarde',    start: 840, end: 1440 },
 ];
 
 function timeRangesOverlapMinutes(s1: number, e1: number, s2: number, e2: number) {
   return s1 < e2 && e1 > s2;
 }
 
-// Available LID positions based on the floor plan
 const LID_POSITIONS = [
   { id: 'LID 1', label: 'LID 1 (inferior izquierda)' },
   { id: 'LID 2', label: 'LID 2 (inferior media)' },
@@ -34,7 +33,6 @@ export function ConfigPanel() {
     setConfig({ [key]: value } as Pick<AppConfig, K>);
   };
 
-  // Get unique leader names from agents (based on selected leader field)
   const leaderNames = useMemo(() => {
     const field = config.leaderField;
     const leaderSet = new Set<string>();
@@ -45,7 +43,6 @@ export function ConfigPanel() {
     return Array.from(leaderSet).sort();
   }, [agents, config.leaderField]);
 
-  // Calculate how many agents would be excluded when a leader is selected
   const excludedTeamSize = useMemo(() => {
     if (!excludedLeader) return 0;
     const field = config.leaderField;
@@ -57,7 +54,6 @@ export function ConfigPanel() {
 
   const { layout } = useStore();
 
-  // Per-shift capacity analysis
   const shiftCapacity = useMemo(() => {
     const activeBoxes = layout.boxes.filter((b) => b.type === 'box' && b.activo);
     const activeAgents = excludedLeader
@@ -68,7 +64,6 @@ export function ConfigPanel() {
       : agents;
 
     return SHIFT_WINDOWS.map(({ key, label, start, end }) => {
-      // Agents whose schedule overlaps this shift window
       const shiftAgents = activeAgents.filter((a) => {
         const s = timeToMinutes(a.entryTime);
         let e = timeToMinutes(a.exitTime);
@@ -76,13 +71,9 @@ export function ConfigPanel() {
         return timeRangesOverlapMinutes(s, e, start, end);
       });
 
-      // For each box, simulate how many non-overlapping agents from shiftAgents can fit
-      // (greedy: sort by entry, assign if no overlap with already-assigned in this box)
-      // This gives the true capacity accounting for hot-desking within the shift.
       let totalSlots = 0;
       for (const box of activeBoxes) {
         const occupants: { s: number; e: number }[] = [];
-        // Sort shiftAgents by entry time and greedily pack this box
         const sorted = [...shiftAgents].sort((a, b) => timeToMinutes(a.entryTime) - timeToMinutes(b.entryTime));
         for (const agent of sorted) {
           const s = timeToMinutes(agent.entryTime);
@@ -110,163 +101,148 @@ export function ConfigPanel() {
     setConfig({ excludedLeader: leaderName === excludedLeader ? '' : leaderName });
   };
 
+  const hasShortage = shiftCapacity.some((s) => s.shortage > 0);
+
   return (
-    <div className="space-y-4">
-      {/* Quick Actions Banner */}
-      <Card className="border-indigo-500/30 bg-indigo-900/20">
-        <CardBody className="py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                <Settings className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-white">Reasignar Lugares</h3>
-                <p className="text-xs text-indigo-300">
-                  Recalcula todas las asignaciones con la configuración actual
-                </p>
-              </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+      {/* Quick Actions */}
+      <div style={{ background: '#ffffff', border: '1px solid #e8e8e8', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 9, background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Settings style={{ width: 18, height: 18, color: '#888888' }} />
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-white tabular-nums">{agents.length}</div>
-              <div className="text-xs text-indigo-300">agentes</div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#111111', margin: 0 }}>Reasignar Lugares</p>
+              <p style={{ fontSize: 11, color: '#aaaaaa', margin: 0 }}>Recalcula con la configuración actual</p>
             </div>
           </div>
-          <Button
-            variant="primary"
-            className="w-full mt-3"
-            onClick={handleRecalculate}
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#111111', fontVariantNumeric: 'tabular-nums' }}>{agents.length}</div>
+            <div style={{ fontSize: 10, color: '#bbbbbb' }}>agentes</div>
+          </div>
+        </div>
+        <div style={{ padding: '10px 16px' }}>
+          <Button variant="primary" className="w-full" onClick={handleRecalculate}>
+            <RotateCcw className="w-3.5 h-3.5 mr-2" />
             Reasignar Todos los Lugares
           </Button>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
 
-      {/* Shift Capacity Analysis */}
+      {/* Shift Capacity */}
       {agents.length > 0 && (
-        <Card className={shiftCapacity.some((s) => s.shortage > 0) ? 'border-amber-600/40 bg-amber-900/10' : 'border-slate-700'}>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertTriangle className={`w-4 h-4 ${shiftCapacity.some((s) => s.shortage > 0) ? 'text-amber-400' : 'text-slate-400'}`} />
-              <span className="font-medium text-slate-200">Capacidad por Turno</span>
-            </div>
-          </CardHeader>
-          <CardBody className="space-y-2">
+        <div style={{
+          background: '#ffffff', borderRadius: 12, overflow: 'hidden',
+          border: hasShortage ? '1px solid #fde68a' : '1px solid #e8e8e8',
+        }}>
+          <div style={{ padding: '10px 14px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: 7 }}>
+            <AlertTriangle style={{ width: 14, height: 14, color: hasShortage ? '#d97706' : '#cccccc' }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#444444' }}>Capacidad por Turno</span>
+          </div>
+          <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {shiftCapacity.map(({ key, label, agentCount, totalSlots, shortage }) => {
               const pct = totalSlots > 0 ? Math.min(100, Math.round((agentCount / totalSlots) * 100)) : 0;
               const ok = shortage === 0;
               return (
                 <div key={key}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-slate-300">{label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500">{agentCount} agentes / {totalSlots} lugares</span>
-                      {ok ? (
-                        <span className="text-xs font-semibold text-emerald-400">OK</span>
-                      ) : (
-                        <span className="text-xs font-semibold text-amber-400">Faltan {shortage}</span>
-                      )}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: '#444444' }}>{label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 11, color: '#bbbbbb' }}>{agentCount} / {totalSlots}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: ok ? '#059669' : '#d97706' }}>
+                        {ok ? 'OK' : `−${shortage}`}
+                      </span>
                     </div>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-700 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${ok ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                      style={{ width: `${Math.min(pct, 100)}%` }}
-                    />
+                  <div style={{ height: 5, borderRadius: 999, background: '#f0f0f0', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 999,
+                      background: ok ? '#059669' : '#d97706',
+                      width: `${Math.min(pct, 100)}%`,
+                      transition: 'width 0.3s ease',
+                    }} />
                   </div>
                 </div>
               );
             })}
-          </CardBody>
-        </Card>
+          </div>
+        </div>
       )}
 
-      {/* Exclude Leader Section */}
-      <Card className={excludedLeader ? 'border-red-500/30 bg-red-900/20' : 'border-slate-700'}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {excludedLeader ? (
-                <EyeOff className="w-4 h-4 text-red-400" />
-              ) : (
-                <Eye className="w-4 h-4 text-slate-400" />
-              )}
-              <span className={`font-medium ${excludedLeader ? 'text-red-200' : 'text-slate-200'}`}>
-                {excludedLeader ? 'Excluyendo del Cálculo' : 'Excluir Equipo del Cálculo'}
-              </span>
-            </div>
-            {excludedLeader && (
-              <button
-                onClick={() => setConfig({ excludedLeader: '' })}
-                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/50 rounded-lg transition-colors"
-                title="Limpiar exclusión"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+      {/* Exclude Leader */}
+      <div style={{
+        background: '#ffffff', borderRadius: 12, overflow: 'hidden',
+        border: excludedLeader ? '1px solid #fecaca' : '1px solid #e8e8e8',
+      }}>
+        <div style={{ padding: '10px 14px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            {excludedLeader
+              ? <EyeOff style={{ width: 14, height: 14, color: '#dc2626' }} />
+              : <Eye style={{ width: 14, height: 14, color: '#aaaaaa' }} />
+            }
+            <span style={{ fontSize: 12, fontWeight: 600, color: excludedLeader ? '#dc2626' : '#444444' }}>
+              {excludedLeader ? 'Excluyendo del Cálculo' : 'Excluir Equipo del Cálculo'}
+            </span>
           </div>
-        </CardHeader>
-        <CardBody>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-slate-400">
-              Selecciona un líder para excluirlo junto con todo su equipo de la asignación
+          {excludedLeader && (
+            <button
+              onClick={() => setConfig({ excludedLeader: '' })}
+              style={{ padding: 4, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 6 }}
+            >
+              <X style={{ width: 14, height: 14 }} />
+            </button>
+          )}
+        </div>
+        <div style={{ padding: '10px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <p style={{ fontSize: 12, color: '#aaaaaa', margin: 0 }}>
+              Excluye un líder y su equipo del cálculo
             </p>
             {excludedTeamSize > 0 && (
-              <div className="text-right">
-                <span className="text-xs text-slate-500">Agentes fuera del cálculo:</span>
-                <span className="text-2xl font-bold text-red-400 tabular-nums ml-2">
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                <span style={{ fontSize: 10, color: '#bbbbbb' }}>Excluidos:</span>
+                <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626', fontVariantNumeric: 'tabular-nums' }}>
                   {excludedTeamSize}
                 </span>
               </div>
             )}
           </div>
 
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <button
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-between ${
-                !excludedLeader
-                  ? 'text-slate-300 hover:bg-slate-700'
-                  : excludedLeader
-                    ? 'bg-red-600 text-white'
-                    : 'text-slate-300'
-              }`}
+              style={{
+                width: '100%', textAlign: 'left', padding: '7px 10px', borderRadius: 8,
+                fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s',
+                background: !excludedLeader ? '#111111' : 'transparent',
+                color: !excludedLeader ? '#ffffff' : '#888888',
+                border: '1px solid transparent',
+              }}
               onClick={() => handleExcludeLeader('')}
             >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-slate-600" />
-                <span>Incluir todos los equipos</span>
-              </div>
-              {!excludedLeader && (
-                <Trash2 className="w-4 h-4 text-slate-500" />
-              )}
+              Incluir todos los equipos
             </button>
 
             {leaderNames.map((leader) => (
               <button
                 key={leader}
                 onClick={() => handleExcludeLeader(leader)}
-                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-between ${
-                  excludedLeader === leader
-                    ? 'bg-red-600 text-white'
-                    : excludedLeader
-                      ? 'opacity-40 cursor-not-allowed text-slate-500'
-                      : 'text-slate-300 hover:bg-slate-700'
-                }`}
+                style={{
+                  width: '100%', textAlign: 'left', padding: '7px 10px', borderRadius: 8,
+                  fontSize: 12, fontWeight: 500, cursor: excludedLeader && excludedLeader !== leader ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  transition: 'all 0.15s',
+                  background: excludedLeader === leader ? '#dc2626' : 'transparent',
+                  color: excludedLeader === leader ? '#ffffff' : excludedLeader ? '#cccccc' : '#555555',
+                  opacity: excludedLeader && excludedLeader !== leader ? 0.45 : 1,
+                  border: '1px solid transparent',
+                }}
               >
-                <span className="truncate">{leader}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{leader}</span>
                 {excludedLeader === leader && (
-                  <span className="text-xs bg-red-900/50 text-red-300 px-2 py-0.5 rounded-full">
+                  <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.2)', padding: '1px 6px', borderRadius: 4 }}>
                     Excluido
-                  </span>
-                )}
-                {excludedLeader && excludedLeader !== leader && (
-                  <span className="text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded-full">
-                    {agents.filter((a) => {
-                      const field = config.leaderField;
-                      const l = field === 'jefe' ? a.jefe : a.superior;
-                      return l === leader;
-                    }).length}
                   </span>
                 )}
               </button>
@@ -274,79 +250,57 @@ export function ConfigPanel() {
           </div>
 
           {excludedLeader && (
-            <div className="mt-3 p-3 rounded-lg bg-red-900/30 border border-red-700/50">
-              <p className="text-xs text-red-300">
-                <strong>Nota:</strong> El equipo de "{excludedLeader}" queda fuera del cálculo y sus lugares se liberan para reasignar al resto.
+            <div style={{ marginTop: 10, padding: 10, borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca' }}>
+              <p style={{ fontSize: 11, color: '#dc2626', margin: 0 }}>
+                El equipo de <strong>"{excludedLeader}"</strong> queda fuera del cálculo.
               </p>
             </div>
           )}
-        </CardBody>
-      </Card>
-
-      {/* Divider */}
-      <div className="h-px bg-slate-700 w-full" />
-
-      <div className="flex items-center gap-2">
-        <Settings className="w-5 h-5 text-slate-400" />
-        <h3 className="text-lg font-semibold text-slate-100">Configuración</h3>
+        </div>
       </div>
 
-      {/* Leader Field Selection */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-slate-400" />
-            <span className="font-medium text-slate-200">Agrupación por Líder</span>
-          </div>
-        </CardHeader>
-        <CardBody>
-          <Select
-            label="Campo de Líder"
-            value={config.leaderField}
-            onChange={(e) => handleConfigChange('leaderField', e.target.value as AppConfig['leaderField'])}
-            options={[
-              { value: 'superior', label: 'SUPERIOR (Jerarquía superior)' },
-              { value: 'jefe', label: 'JEFE (Reporta directo)' },
-            ]}
-          />
-          <p className="text-xs text-slate-500 mt-2">
-            Define qué campo usar para agrupar equipos y calcular cercanía al líder.
-          </p>
-        </CardBody>
-      </Card>
+      {/* Divider */}
+      <div style={{ height: 1, background: '#f0f0f0' }} />
 
-      {/* Leader Box Assignments */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-slate-400" />
-            <span className="font-medium text-slate-200">Puestos de Líder (LID)</span>
-          </div>
-        </CardHeader>
-        <CardBody className="space-y-3">
-          <p className="text-sm text-slate-400">
-            Asigna qué líder ocupa cada posición LID en el plano físico.
-          </p>
+      {/* Section header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Settings style={{ width: 14, height: 14, color: '#aaaaaa' }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#444444' }}>Configuración</span>
+      </div>
 
+      {/* Leader Field */}
+      <ConfigCard icon={<Users style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Agrupación por Líder">
+        <Select
+          label="Campo de Líder"
+          value={config.leaderField}
+          onChange={(e) => handleConfigChange('leaderField', e.target.value as AppConfig['leaderField'])}
+          options={[
+            { value: 'superior', label: 'SUPERIOR (Jerarquía superior)' },
+            { value: 'jefe', label: 'JEFE (Reporta directo)' },
+          ]}
+        />
+        <p style={{ fontSize: 11, color: '#bbbbbb', marginTop: 6, marginBottom: 0 }}>
+          Define qué campo usar para agrupar equipos.
+        </p>
+      </ConfigCard>
+
+      {/* LID Assignments */}
+      <ConfigCard icon={<Shield style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Puestos de Líder (LID)">
+        <p style={{ fontSize: 12, color: '#aaaaaa', marginTop: 0, marginBottom: 10 }}>
+          Asigna qué líder ocupa cada posición LID.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {LID_POSITIONS.map((lid) => {
             const assignedLeader = config.leaderBoxAssignments?.[lid.id];
             return (
-              <div key={lid.id} className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-300 w-24">{lid.id}</span>
-                <span className="text-xs text-slate-500 w-56 truncate">{lid.label}</span>
-
+              <div key={lid.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#444444', width: 52, flexShrink: 0 }}>{lid.id}</span>
                 <Select
                   value={assignedLeader || ''}
                   onChange={(e) => {
                     const value = e.target.value || undefined;
-                    const newAssignments = {
-                      ...config.leaderBoxAssignments,
-                      [lid.id]: value,
-                    };
-                    // Remove empty entries
-                    Object.keys(newAssignments).forEach((k) => {
-                      if (!newAssignments[k]) delete newAssignments[k];
-                    });
+                    const newAssignments = { ...config.leaderBoxAssignments, [lid.id]: value };
+                    Object.keys(newAssignments).forEach((k) => { if (!newAssignments[k]) delete newAssignments[k]; });
                     setConfig({ leaderBoxAssignments: newAssignments as never });
                   }}
                   options={[
@@ -355,7 +309,6 @@ export function ConfigPanel() {
                   ]}
                   className="flex-1"
                 />
-
                 {assignedLeader && (
                   <button
                     onClick={() => {
@@ -363,60 +316,72 @@ export function ConfigPanel() {
                       delete newAssignments[lid.id];
                       setConfig({ leaderBoxAssignments: newAssignments as never });
                     }}
-                    className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors"
-                    title="Remover asignación"
+                    style={{ padding: 4, color: '#cccccc', background: 'none', border: 'none', cursor: 'pointer' }}
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X style={{ width: 13, height: 13 }} />
                   </button>
                 )}
               </div>
             );
           })}
-        </CardBody>
-      </Card>
+        </div>
+      </ConfigCard>
 
-      {/* Leaders Schedule */}
+      {/* Leader Schedules */}
       {leaders.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-400" />
-              <span className="font-medium text-slate-200">Horarios de Líderes</span>
-            </div>
-          </CardHeader>
-          <CardBody className="p-0">
-            <p className="px-3 pt-2 pb-1 text-xs text-slate-500">Editá los horarios para ajustar la distribución. Los cambios se aplican al reasignar.</p>
-            <table className="w-full text-xs">
+        <ConfigCard icon={<Clock style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Horarios de Líderes">
+          <p style={{ fontSize: 11, color: '#aaaaaa', marginTop: 0, marginBottom: 8 }}>
+            Los cambios se aplican al reasignar.
+          </p>
+          <div style={{ border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden' }}>
+            <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="bg-slate-900/60">
-                  <th className="px-3 py-2 text-left font-semibold text-slate-400 uppercase tracking-wide">Líder</th>
-                  <th className="px-3 py-2 text-center font-semibold text-slate-400 uppercase tracking-wide">Ingreso</th>
-                  <th className="px-3 py-2 text-center font-semibold text-slate-400 uppercase tracking-wide">Egreso</th>
-                  <th className="px-3 py-2 text-center font-semibold text-slate-400 uppercase tracking-wide">Equipo</th>
+                <tr style={{ background: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
+                  <th style={{ padding: '7px 10px', textAlign: 'left', fontWeight: 600, color: '#aaaaaa', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Líder</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'center', fontWeight: 600, color: '#aaaaaa', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Ingreso</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'center', fontWeight: 600, color: '#aaaaaa', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Egreso</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'center', fontWeight: 600, color: '#aaaaaa', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Equipo</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
-                {leaders.map((l) => (
-                  <tr key={l.id} className="hover:bg-slate-700/20 transition-colors">
-                    <td className="px-3 py-2 font-medium text-slate-200 truncate max-w-[120px]">{l.nombre}</td>
-                    <td className="px-2 py-1.5 text-center">
+              <tbody>
+                {leaders.map((l, idx) => (
+                  <tr key={l.id} style={{ borderBottom: idx < leaders.length - 1 ? '1px solid #f5f5f5' : 'none' }}>
+                    <td style={{ padding: '6px 10px', fontWeight: 500, color: '#333333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 110 }}>
+                      {l.nombre}
+                    </td>
+                    <td style={{ padding: '4px 6px', textAlign: 'center' }}>
                       <input
                         type="time"
                         value={l.entryTime}
                         onChange={(e) => updateLeader(l.id, { entryTime: e.target.value })}
-                        className="w-24 bg-slate-800 border border-slate-600 rounded-md px-2 py-1 text-indigo-300 font-mono text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 text-center"
+                        style={{
+                          width: 90, background: '#f8f8f8', border: '1px solid #e8e8e8',
+                          borderRadius: 6, padding: '4px 6px', color: '#333333',
+                          fontFamily: 'monospace', fontSize: 12, textAlign: 'center',
+                          outline: 'none',
+                        }}
                       />
                     </td>
-                    <td className="px-2 py-1.5 text-center">
+                    <td style={{ padding: '4px 6px', textAlign: 'center' }}>
                       <input
                         type="time"
                         value={l.exitTime}
                         onChange={(e) => updateLeader(l.id, { exitTime: e.target.value })}
-                        className="w-24 bg-slate-800 border border-slate-600 rounded-md px-2 py-1 text-indigo-300 font-mono text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 text-center"
+                        style={{
+                          width: 90, background: '#f8f8f8', border: '1px solid #e8e8e8',
+                          borderRadius: 6, padding: '4px 6px', color: '#333333',
+                          fontFamily: 'monospace', fontSize: 12, textAlign: 'center',
+                          outline: 'none',
+                        }}
                       />
                     </td>
-                    <td className="px-3 py-2 text-center">
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-700 text-slate-300 font-semibold">
+                    <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: '#f0f0f0', color: '#555555',
+                        fontSize: 11, fontWeight: 600,
+                      }}>
                         {l.teamSize}
                       </span>
                     </td>
@@ -424,166 +389,119 @@ export function ConfigPanel() {
                 ))}
               </tbody>
             </table>
-          </CardBody>
-        </Card>
+          </div>
+        </ConfigCard>
       )}
 
       {/* Time Calculation */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-slate-400" />
-            <span className="font-medium text-slate-200">Cálculo de Horarios</span>
-          </div>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-200">Respetar hora de salida del CSV</p>
-              <p className="text-xs text-slate-500">
-                Si está desactivado, calcula según contrato
-              </p>
-            </div>
-            <button
-              onClick={() => handleConfigChange('respectCsvExitTime', !config.respectCsvExitTime)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                config.respectCsvExitTime ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                config.respectCsvExitTime ? 'translate-x-5' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
-        </CardBody>
-      </Card>
+      <ConfigCard icon={<Layers style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Cálculo de Horarios">
+        <ToggleRow
+          label="Respetar hora de salida del CSV"
+          description="Si desactivado, calcula según contrato"
+          value={config.respectCsvExitTime}
+          onChange={() => handleConfigChange('respectCsvExitTime', !config.respectCsvExitTime)}
+        />
+      </ConfigCard>
 
       {/* CBS Segment */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <UserIcon className="w-4 h-4 text-slate-400" />
-            <span className="font-medium text-slate-200">Segmento CBS</span>
-          </div>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-200">Mantener CBS junto</p>
-              <p className="text-xs text-slate-500">
-                Agrupa todo el segmento CBS en la misma zona
-              </p>
-            </div>
-            <button
-              onClick={() => handleConfigChange('keepCbsTogether', !config.keepCbsTogether)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                config.keepCbsTogether ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                config.keepCbsTogether ? 'translate-x-5' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
-
-          {config.keepCbsTogether && (
+      <ConfigCard icon={<UserIcon style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Segmento CBS">
+        <ToggleRow
+          label="Mantener CBS junto"
+          description="Agrupa el segmento CBS en la misma zona"
+          value={config.keepCbsTogether}
+          onChange={() => handleConfigChange('keepCbsTogether', !config.keepCbsTogether)}
+        />
+        {config.keepCbsTogether && (
+          <div style={{ marginTop: 10 }}>
             <Select
               label="Zona para CBS (opcional)"
               value={config.cbsZoneId || ''}
               onChange={(e) => handleConfigChange('cbsZoneId', e.target.value || undefined)}
               options={[
                 { value: '', label: 'Cualquier zona' },
-                { value: 'LID 1', label: 'LID 1' },
-                { value: 'LID 2', label: 'LID 2' },
-                { value: 'LID 3', label: 'LID 3' },
-                { value: 'LID 4', label: 'LID 4' },
-                { value: 'LID 5', label: 'LID 5' },
-                { value: 'LID 6', label: 'LID 6' },
+                { value: 'LID 1', label: 'LID 1' }, { value: 'LID 2', label: 'LID 2' },
+                { value: 'LID 3', label: 'LID 3' }, { value: 'LID 4', label: 'LID 4' },
+                { value: 'LID 5', label: 'LID 5' }, { value: 'LID 6', label: 'LID 6' },
                 { value: 'LID 7', label: 'LID 7' },
               ]}
             />
-          )}
-        </CardBody>
-      </Card>
+          </div>
+        )}
+      </ConfigCard>
 
       {/* Assignment Preferences */}
-      <Card>
-        <CardHeader>
-          <span className="font-medium text-slate-200">Preferencias de Asignación</span>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-200">Priorizar cercanía al líder</p>
-              <p className="text-xs text-slate-500">
-                Intenta sentar al equipo cerca de su líder
-              </p>
-            </div>
-            <button
-              onClick={() => handleConfigChange('prioritizeTeamProximity', !config.prioritizeTeamProximity)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                config.prioritizeTeamProximity ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                config.prioritizeTeamProximity ? 'translate-x-5' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
+      <ConfigCard icon={<Settings style={{ width: 14, height: 14, color: '#aaaaaa' }} />} title="Preferencias de Asignación">
+        <ToggleRow
+          label="Priorizar cercanía al líder"
+          description="Sienta al equipo cerca de su líder"
+          value={config.prioritizeTeamProximity}
+          onChange={() => handleConfigChange('prioritizeTeamProximity', !config.prioritizeTeamProximity)}
+        />
+        <div style={{ height: 1, background: '#f0f0f0', margin: '10px 0' }} />
+        <ToggleRow
+          label="Permitir equipos mezclados en fila"
+          description="Diferentes líderes pueden compartir fila"
+          value={config.allowMixedTeamsInRow}
+          onChange={() => handleConfigChange('allowMixedTeamsInRow', !config.allowMixedTeamsInRow)}
+        />
+        <div style={{ height: 1, background: '#f0f0f0', margin: '10px 0' }} />
+        <ToggleRow
+          label="Sistema Viborita"
+          description="Ignora zonas — llena boxes en orden"
+          value={config.snakeMode}
+          onChange={() => handleConfigChange('snakeMode', !config.snakeMode)}
+        />
+      </ConfigCard>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-200">Permitir equipos mezclados en fila</p>
-              <p className="text-xs text-slate-500">
-                Permite que diferentes líderes compartan fila
-              </p>
-            </div>
-            <button
-              onClick={() => handleConfigChange('allowMixedTeamsInRow', !config.allowMixedTeamsInRow)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                config.allowMixedTeamsInRow ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                config.allowMixedTeamsInRow ? 'translate-x-5' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
+      {/* Apply */}
+      <Button variant="primary" className="w-full" onClick={handleRecalculate}>
+        <CheckCircle className="w-3.5 h-3.5 mr-2" />
+        Aplicar y Ver Resultados
+      </Button>
+    </div>
+  );
+}
 
-          <div className="h-px bg-slate-700" />
+function ConfigCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #e8e8e8', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ padding: '10px 14px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: 7 }}>
+        {icon}
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#444444' }}>{title}</span>
+      </div>
+      <div style={{ padding: '12px 14px' }}>{children}</div>
+    </div>
+  );
+}
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-200">Sistema Viborita</p>
-              <p className="text-xs text-slate-500">
-                Ignora zonas y proximidad — llena boxes disponibles en orden
-              </p>
-            </div>
-            <button
-              onClick={() => handleConfigChange('snakeMode', !config.snakeMode)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                config.snakeMode ? 'bg-indigo-600' : 'bg-slate-700'
-              }`}
-            >
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                config.snakeMode ? 'translate-x-5' : 'translate-x-0.5'
-              }`} />
-            </button>
-          </div>
-        </CardBody>
-      </Card>
-
-      {/* Save Button */}
-      <Button
-        variant="primary"
-        className="w-full"
-        onClick={() => {
-          handleRecalculate();
+function ToggleRow({ label, description, value, onChange }: {
+  label: string;
+  description: string;
+  value: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 13, fontWeight: 500, color: '#333333', margin: 0 }}>{label}</p>
+        <p style={{ fontSize: 11, color: '#aaaaaa', margin: '2px 0 0' }}>{description}</p>
+      </div>
+      <button
+        onClick={onChange}
+        style={{
+          position: 'relative', width: 40, height: 22, borderRadius: 999,
+          background: value ? '#111111' : '#e0e0e0',
+          border: 'none', cursor: 'pointer', flexShrink: 0,
+          transition: 'background 0.2s ease',
         }}
       >
-        <CheckCircle className="w-4 h-4 mr-2" />
-        Aplicar Configuración y Ver Resultados
-      </Button>
+        <span style={{
+          position: 'absolute', top: 2, width: 18, height: 18, background: '#ffffff',
+          borderRadius: '50%', transition: 'transform 0.2s ease',
+          transform: value ? 'translateX(20px)' : 'translateX(2px)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+        }} />
+      </button>
     </div>
   );
 }

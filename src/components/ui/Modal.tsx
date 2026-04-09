@@ -18,26 +18,17 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
     } else {
       document.body.style.overflow = '';
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
       <div
         className={clsx(
-          'relative bg-slate-800 rounded-lg shadow-xl max-h-[90vh] overflow-hidden flex flex-col',
+          'relative bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[#e8e8e8]',
           {
             'w-full max-w-md': size === 'sm',
             'w-full max-w-lg': size === 'md',
@@ -46,27 +37,22 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
           }
         )}
       >
-        {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
-            <h2 className="text-lg font-semibold text-white">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f0f0]">
+            <h2 className="text-base font-semibold text-[#111111]">{title}</h2>
             <button
               onClick={onClose}
-              className="p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
+              className="p-1.5 text-[#aaaaaa] hover:text-[#111111] hover:bg-[#f5f5f5] rounded-lg transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
-
-        {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {children}
         </div>
-
-        {/* Footer */}
         {footer && (
-          <div className="px-6 py-4 border-t border-slate-700 bg-slate-900/50">
+          <div className="px-6 py-4 border-t border-[#f0f0f0] bg-[#fafafa]">
             {footer}
           </div>
         )}

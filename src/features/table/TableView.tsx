@@ -7,7 +7,6 @@ import * as XLSX from 'xlsx';
 export function TableView() {
   const { agents, assignments, layout, config, stats } = useStore();
 
-  // Prepare table data
   const tableData = useMemo(() => {
     return agents
       .filter((agent) => {
@@ -19,22 +18,14 @@ export function TableView() {
       .map((agent) => {
         const boxId = assignments.get(agent.id);
         const box = boxId ? layout.boxes.find((b) => b.id === boxId) : undefined;
-
-        return {
-          ...agent,
-          boxNumber: box?.numero || '-',
-          boxZone: box?.zona || '-',
-        };
+        return { ...agent, boxNumber: box?.numero || '-', boxZone: box?.zona || '-' };
       })
       .sort((a, b) => {
-        // Sort by box number, then unassigned
         const aNum = typeof a.boxNumber === 'number' ? a.boxNumber : -1;
         const bNum = typeof b.boxNumber === 'number' ? b.boxNumber : -1;
         if (aNum === -1 && bNum !== -1) return 1;
         if (aNum !== -1 && bNum === -1) return -1;
-        if (aNum !== -1 && bNum !== -1) {
-          return aNum - bNum;
-        }
+        if (aNum !== -1 && bNum !== -1) return aNum - bNum;
         return a.nombre.localeCompare(b.nombre);
       });
   }, [agents, assignments, layout.boxes, config.excludedLeader, config.leaderField]);
@@ -54,106 +45,109 @@ export function TableView() {
       Turno: row.shift,
       Estado: row.assignmentStatus,
     }));
-
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Asignaciones');
-
-    // Generate filename with timestamp
-    const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `asignaciones-boxes-${timestamp}.xlsx`);
+    XLSX.writeFile(wb, `asignaciones-boxes-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const handleExportAssignments = () => {
     const exportRows = useStore.getState().exportData();
-
     const ws = XLSX.utils.json_to_sheet(exportRows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Asignaciones');
-
-    const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `reporte-asignaciones-${timestamp}.xlsx`);
+    XLSX.writeFile(wb, `reporte-asignaciones-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" style={{ background: '#f6f6f6' }}>
+
       {/* Header */}
-      <div className="bg-slate-900 border-b border-slate-800 px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div style={{ background: '#ffffff', borderBottom: '1px solid #e8e8e8', padding: '14px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h1 className="text-2xl font-bold text-white">Tabla de Asignaciones</h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: '#111111', letterSpacing: '-0.01em', margin: 0 }}>
+              Tabla de Asignaciones
+            </h1>
+            <p style={{ fontSize: 12, color: '#aaaaaa', margin: '3px 0 0' }}>
               {stats.assignedAgents} de {stats.totalAgents} agentes asignados
             </p>
           </div>
-
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', gap: 8 }}>
             <Button variant="outline" size="sm" onClick={handleExportCSV}>
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-3.5 h-3.5 mr-1.5" />
               Exportar CSV
             </Button>
             <Button variant="primary" size="sm" onClick={handleExportAssignments}>
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-3.5 h-3.5 mr-1.5" />
               Exportar Reporte
             </Button>
           </div>
         </div>
 
-        {/* Stats Bar */}
-        <div className="flex items-center gap-6 mt-4 text-sm">
-          <StatItem label="Ocupación" value={`${stats.occupationRate}%`} color="success" />
-          <StatItem label="Boxes Usados" value={`${stats.usedBoxes}/${stats.totalBoxes}`} color="primary" />
-          <StatItem label="Reutilizados" value={stats.reusedBoxes} color="warning" />
-          <StatItem label="Fragmentación" value={`${stats.fragmentationScore}%`} color="gray" />
+        {/* Stats bar */}
+        <div style={{ display: 'flex', gap: 24, marginTop: 12 }}>
+          <StatItem label="Ocupación" value={`${stats.occupationRate}%`} accent="#059669" />
+          <StatItem label="Boxes usados" value={`${stats.usedBoxes}/${stats.totalBoxes}`} accent="#2563eb" />
+          <StatItem label="Reutilizados" value={stats.reusedBoxes} accent="#d97706" />
+          <StatItem label="Fragmentación" value={`${stats.fragmentationScore}%`} accent="#888888" />
         </div>
       </div>
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-800/50 sticky top-0">
-            <tr>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Box</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Zona</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Nombre</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Usuario</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Líder</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Segmento</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Horario</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Contrato</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Turno</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-200">Estado</th>
+        <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+            <tr style={{ background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
+              {['Box', 'Zona', 'Nombre', 'Usuario', 'Líder', 'Segmento', 'Horario', 'Contrato', 'Turno', 'Estado'].map((h) => (
+                <th key={h} style={{
+                  padding: '9px 14px', textAlign: 'left',
+                  fontSize: 10, fontWeight: 600, color: '#bbbbbb',
+                  textTransform: 'uppercase', letterSpacing: '0.07em',
+                  borderBottom: '1px solid #e8e8e8',
+                  background: '#fafafa',
+                }}>{h}</th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800 bg-slate-900/30">
-            {tableData.map((agent) => (
-              <tr key={agent.id} className="hover:bg-slate-800/50">
-                <td className="px-4 py-3 font-medium text-slate-100">{agent.boxNumber}</td>
-                <td className="px-4 py-3 text-slate-300">{agent.boxZone}</td>
-                <td className="px-4 py-3 font-medium text-slate-100">{agent.nombre}</td>
-                <td className="px-4 py-3 text-slate-400">{agent.usuario}</td>
-                <td className="px-4 py-3 text-slate-300">
+          <tbody>
+            {tableData.map((agent, idx) => (
+              <tr
+                key={agent.id}
+                style={{
+                  background: idx % 2 === 0 ? '#ffffff' : '#fafafa',
+                  borderBottom: '1px solid #f0f0f0',
+                  transition: 'background 0.1s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
+                onMouseLeave={e => (e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa')}
+              >
+                <td style={{ padding: '9px 14px', fontWeight: 700, color: '#111111', fontVariantNumeric: 'tabular-nums' }}>
+                  {agent.boxNumber}
+                </td>
+                <td style={{ padding: '9px 14px', color: '#888888', fontSize: 12 }}>{agent.boxZone}</td>
+                <td style={{ padding: '9px 14px', fontWeight: 600, color: '#222222' }}>{agent.nombre}</td>
+                <td style={{ padding: '9px 14px', color: '#aaaaaa', fontFamily: 'monospace', fontSize: 12 }}>{agent.usuario}</td>
+                <td style={{ padding: '9px 14px', color: '#555555' }}>
                   {config.leaderField === 'jefe' ? agent.jefe : agent.superior}
                 </td>
-                <td className="px-4 py-3 text-slate-300">{agent.segmento}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-1">
-                    <span className="text-slate-100">{agent.entryTime}</span>
-                    <span className="text-slate-500">→</span>
-                    <span className="text-slate-100">{agent.exitTime}</span>
-                  </div>
+                <td style={{ padding: '9px 14px', color: '#777777' }}>{agent.segmento}</td>
+                <td style={{ padding: '9px 14px' }}>
+                  <span style={{ color: '#333333', fontVariantNumeric: 'tabular-nums' }}>{agent.entryTime}</span>
+                  <span style={{ color: '#cccccc', margin: '0 4px' }}>→</span>
+                  <span style={{ color: '#333333', fontVariantNumeric: 'tabular-nums' }}>{agent.exitTime}</span>
                 </td>
-                <td className="px-4 py-3 text-slate-300">
+                <td style={{ padding: '9px 14px', color: '#888888' }}>
                   {agent.contrato}
-                  <span className="text-slate-500 ml-1">({agent.dailyHours}h)</span>
+                  <span style={{ color: '#cccccc', marginLeft: 4 }}>({agent.dailyHours}h)</span>
                 </td>
-                <td className="px-4 py-3">
+                <td style={{ padding: '9px 14px' }}>
                   <ShiftBadge shift={agent.shift} />
                 </td>
-                <td className="px-4 py-3">
+                <td style={{ padding: '9px 14px' }}>
                   <StatusBadge status={agent.assignmentStatus} />
                   {agent.isLocked && (
-                    <span className="ml-1 text-xs text-primary-600">🔒</span>
+                    <span style={{ marginLeft: 4, fontSize: 11 }}>🔒</span>
                   )}
                 </td>
               </tr>
@@ -161,13 +155,10 @@ export function TableView() {
           </tbody>
         </table>
 
-        {/* Empty state */}
         {tableData.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-slate-500">No hay agentes para mostrar</p>
-            <p className="text-sm text-slate-400 mt-1">
-              Sube un archivo CSV para comenzar
-            </p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <p style={{ color: '#bbbbbb', fontSize: 14 }}>No hay agentes para mostrar</p>
+            <p style={{ color: '#cccccc', fontSize: 12, marginTop: 4 }}>Subí un archivo CSV para comenzar</p>
           </div>
         )}
       </div>
@@ -175,25 +166,11 @@ export function TableView() {
   );
 }
 
-interface StatItemProps {
-  label: string;
-  value: string | number;
-  color: 'success' | 'primary' | 'warning' | 'gray' | 'danger';
-}
-
-function StatItem({ label, value, color }: StatItemProps) {
-  const colorClasses = {
-    success: 'text-emerald-400',
-    primary: 'text-indigo-400',
-    warning: 'text-amber-400',
-    gray: 'text-slate-400',
-    danger: 'text-red-400',
-  };
-
+function StatItem({ label, value, accent }: { label: string; value: string | number; accent: string }) {
   return (
-    <div>
-      <span className="text-slate-500">{label}:</span>{' '}
-      <span className={`font-medium ${colorClasses[color]}`}>{value}</span>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+      <span style={{ fontSize: 11, color: '#aaaaaa' }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: accent }}>{value}</span>
     </div>
   );
 }

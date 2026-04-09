@@ -26,19 +26,20 @@ export function App() {
   };
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: '#f2ede4' }}>
+    <div className="h-screen flex flex-col" style={{ background: '#f6f6f6' }}>
       {/* ── Top navbar ── */}
-      <header className="h-13 shrink-0 px-6 flex items-center justify-between"
-        style={{ background: '#1a1714', borderBottom: '1px solid #2c2520' }}
+      <header
+        className="h-12 shrink-0 px-5 flex items-center justify-between"
+        style={{ background: '#111111', borderBottom: '1px solid #1f1f1f' }}
       >
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: '#f2ede4' }}>
-            <Layers className="w-4 h-4" style={{ color: '#1a1714' }} />
+          <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
+            <Layers className="w-3.5 h-3.5 text-white" />
           </div>
           <div className="leading-none">
             <span className="text-sm font-semibold text-white tracking-tight">Box Assignment</span>
-            <span className="block text-[10px] font-normal" style={{ color: 'rgba(255,255,255,0.35)' }}>Sistema de Asignación</span>
+            <span className="block text-[10px] font-normal" style={{ color: 'rgba(255,255,255,0.3)' }}>Sistema de Asignación</span>
           </div>
         </div>
 
@@ -56,8 +57,8 @@ export function App() {
                 onClick={() => setUiState({ currentView: view })}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   currentView === view
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                    ? 'bg-white/12 text-white'
+                    : 'text-white/35 hover:text-white/65 hover:bg-white/6'
                 }`}
               >
                 {icon}
@@ -71,10 +72,10 @@ export function App() {
         {agents.length > 0 && (
           <button
             onClick={() => setUiState({ currentView: 'upload' })}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
-            style={{ color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+            style={{ color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
           >
             <Upload className="w-3.5 h-3.5" />
             Nueva nómina
@@ -92,17 +93,21 @@ export function App() {
 
 function RulesView() {
   return (
-    <div style={{ height: '100%', display: 'flex', background: '#f2ede4' }}>
+    <div style={{ height: '100%', display: 'flex', background: '#f6f6f6' }}>
       <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
           <div style={{ marginBottom: 24 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>Reglas de Asignación</h2>
-            <p style={{ color: '#a8a29e', marginTop: 6, fontSize: 13, margin: '6px 0 0' }}>Configura cómo se asignan los agentes a los boxes.</p>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111111', letterSpacing: '-0.02em', margin: 0 }}>
+              Reglas de Asignación
+            </h2>
+            <p style={{ color: '#999999', marginTop: 4, fontSize: 13, margin: '4px 0 0' }}>
+              Configura cómo se asignan los agentes a los boxes.
+            </p>
           </div>
           <RulesPanel />
         </div>
       </div>
-      <div style={{ width: 296, borderLeft: '1px solid #d4cfc5', background: '#ede8de', padding: 16, overflowY: 'auto' }}>
+      <div style={{ width: 288, borderLeft: '1px solid #e8e8e8', background: '#f2f2f2', padding: 16, overflowY: 'auto' }}>
         <StatsPanel />
       </div>
     </div>
@@ -111,17 +116,21 @@ function RulesView() {
 
 function ConfigView() {
   return (
-    <div style={{ height: '100%', display: 'flex', background: '#f2ede4' }}>
+    <div style={{ height: '100%', display: 'flex', background: '#f6f6f6' }}>
       <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
         <div style={{ maxWidth: 520, margin: '0 auto' }}>
           <div style={{ marginBottom: 24 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>Configuración</h2>
-            <p style={{ color: '#a8a29e', marginTop: 6, fontSize: 13, margin: '6px 0 0' }}>Parámetros generales del sistema de asignación.</p>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#111111', letterSpacing: '-0.02em', margin: 0 }}>
+              Configuración
+            </h2>
+            <p style={{ color: '#999999', marginTop: 4, fontSize: 13, margin: '4px 0 0' }}>
+              Parámetros generales del sistema de asignación.
+            </p>
           </div>
           <ConfigPanel />
         </div>
       </div>
-      <div style={{ width: 296, borderLeft: '1px solid #d4cfc5', background: '#ede8de', padding: 16, overflowY: 'auto' }}>
+      <div style={{ width: 288, borderLeft: '1px solid #e8e8e8', background: '#f2f2f2', padding: 16, overflowY: 'auto' }}>
         <StatsPanel />
       </div>
     </div>

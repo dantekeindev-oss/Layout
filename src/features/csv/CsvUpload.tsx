@@ -40,21 +40,24 @@ export function CsvUpload() {
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f2ede4', padding: 24 }}>
-      <div style={{ width: '100%', maxWidth: 480 }}>
-        {/* Logo / header */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f6f6f6', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 460 }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
-            width: 64, height: 64, borderRadius: 16,
-            background: '#1c1917',
+            width: 52, height: 52, borderRadius: 14,
+            background: '#111111',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 20px',
-            boxShadow: '0 8px 32px rgba(28,25,23,0.18)',
+            margin: '0 auto 18px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
           }}>
-            <Layers style={{ width: 32, height: 32, color: '#f2ede4' }} />
+            <Layers style={{ width: 26, height: 26, color: '#ffffff' }} />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>Box Assignment</h1>
-          <p style={{ color: '#a8a29e', marginTop: 8, fontSize: 14, margin: '8px 0 0' }}>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#111111', letterSpacing: '-0.02em', margin: 0 }}>
+            Box Assignment
+          </h1>
+          <p style={{ color: '#aaaaaa', marginTop: 6, fontSize: 14, margin: '6px 0 0' }}>
             Cargá la nómina para comenzar la asignación de boxes
           </p>
         </div>
@@ -73,39 +76,38 @@ export function CsvUpload() {
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
           style={{
-            borderRadius: 16,
-            border: `2px dashed ${dragOver ? '#1c1917' : '#d4cfc5'}`,
-            padding: '48px 24px',
+            borderRadius: 14,
+            border: `1.5px dashed ${dragOver ? '#111111' : '#d8d8d8'}`,
+            padding: '44px 24px',
             textAlign: 'center',
             cursor: 'pointer',
-            background: dragOver ? 'rgba(28,25,23,0.04)' : '#faf7f2',
-            transition: 'all 0.2s ease',
+            background: dragOver ? 'rgba(17,17,17,0.03)' : '#ffffff',
+            transition: 'all 0.18s ease',
             transform: dragOver ? 'scale(1.01)' : 'scale(1)',
           }}
         >
           {isProcessing ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-              <svg style={{ width: 40, height: 40, color: '#1c1917', animation: 'spin 1s linear infinite' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              <svg style={{ width: 36, height: 36, color: '#111111', animation: 'spin 1s linear infinite' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle style={{ opacity: 0.15 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path style={{ opacity: 0.7 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              <p style={{ color: '#1c1917', fontWeight: 500, margin: 0 }}>Procesando archivo…</p>
+              <p style={{ color: '#555555', fontWeight: 500, margin: 0, fontSize: 14 }}>Procesando archivo…</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
               <div style={{
-                width: 56, height: 56, borderRadius: 12,
-                background: '#fff', border: '1.5px solid #e0dbd0',
+                width: 48, height: 48, borderRadius: 12,
+                background: '#f5f5f5', border: '1px solid #e8e8e8',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
               }}>
-                <Upload style={{ width: 24, height: 24, color: '#78716c' }} />
+                <Upload style={{ width: 22, height: 22, color: '#888888' }} />
               </div>
               <div>
-                <p style={{ color: '#1c1917', fontWeight: 600, fontSize: 15, margin: 0 }}>
+                <p style={{ color: '#111111', fontWeight: 600, fontSize: 15, margin: 0 }}>
                   {dragOver ? 'Suelta el archivo aquí' : 'Arrastrá o hacé clic para seleccionar'}
                 </p>
-                <p style={{ color: '#a8a29e', fontSize: 13, margin: '6px 0 0' }}>CSV · Excel (.xlsx, .xls)</p>
+                <p style={{ color: '#aaaaaa', fontSize: 13, margin: '5px 0 0' }}>CSV · Excel (.xlsx, .xls)</p>
               </div>
             </div>
           )}
@@ -113,18 +115,18 @@ export function CsvUpload() {
 
         {/* Column guide */}
         <div style={{
-          marginTop: 20, padding: 16,
-          background: '#fff', border: '1px solid #e0dbd0', borderRadius: 12,
+          marginTop: 16, padding: '12px 16px',
+          background: '#ffffff', border: '1px solid #e8e8e8', borderRadius: 12,
         }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#a8a29e', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px' }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: '#bbbbbb', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>
             Columnas requeridas
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
             {['DNI', 'USUARIO', 'NOMBRE', 'SUPERIOR', 'SEGMENTO', 'HORARIOS', 'ESTADO', 'CONTRATO', 'SITIO', 'MODALIDAD', 'JEFE'].map((col) => (
               <span key={col} style={{
-                padding: '2px 8px',
-                background: '#f2ede4', border: '1px solid #d4cfc5',
-                borderRadius: 6, fontSize: 11, fontFamily: 'monospace', color: '#1c1917', fontWeight: 600,
+                padding: '2px 7px',
+                background: '#f5f5f5', border: '1px solid #e8e8e8',
+                borderRadius: 5, fontSize: 11, fontFamily: 'monospace', color: '#444444', fontWeight: 600,
               }}>
                 {col}
               </span>
@@ -141,32 +143,33 @@ function ParseResult({ result, onConfirm, onReset }: { result: CsvParseResult; o
   const canProceed = result.agents.length > 0;
 
   const statCards = [
-    { label: 'Filas totales',   value: result.stats.totalRows,       accent: '#78716c' },
-    { label: 'Agentes válidos', value: result.stats.validAgents,      accent: '#1a7a56' },
-    { label: 'Líderes',         value: result.stats.leadersDetected,  accent: '#b06018' },
-    { label: 'Segmentos',       value: result.stats.segmentsDetected, accent: '#6d28d9' },
+    { label: 'Filas totales',   value: result.stats.totalRows,       accent: '#555555' },
+    { label: 'Agentes válidos', value: result.stats.validAgents,      accent: '#059669' },
+    { label: 'Líderes',         value: result.stats.leadersDetected,  accent: '#d97706' },
+    { label: 'Segmentos',       value: result.stats.segmentsDetected, accent: '#7c3aed' },
   ];
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', background: '#f2ede4', padding: 24 }}>
+    <div style={{ height: '100%', overflow: 'auto', background: '#f6f6f6', padding: 24 }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1c1917', letterSpacing: '-0.02em', margin: 0 }}>
+
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111111', letterSpacing: '-0.02em', margin: 0 }}>
             Resultado del análisis
           </h1>
-          <p style={{ color: '#a8a29e', fontSize: 13, margin: '6px 0 0' }}>Revisá los datos antes de confirmar</p>
+          <p style={{ color: '#aaaaaa', fontSize: 13, margin: '5px 0 0' }}>Revisá los datos antes de confirmar</p>
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
           {statCards.map(({ label, value, accent }) => (
             <div key={label} style={{
-              background: '#fff', border: `1px solid #e0dbd0`,
-              borderTop: `3px solid ${accent}`,
+              background: '#ffffff', border: '1px solid #e8e8e8',
+              borderTop: `2px solid ${accent}`,
               borderRadius: 12, padding: 16, textAlign: 'center',
             }}>
-              <div style={{ fontSize: 32, fontWeight: 800, color: accent, lineHeight: 1 }}>{value}</div>
-              <div style={{ fontSize: 11, color: '#a8a29e', fontWeight: 500, marginTop: 4 }}>{label}</div>
+              <div style={{ fontSize: 30, fontWeight: 700, color: accent, lineHeight: 1 }}>{value}</div>
+              <div style={{ fontSize: 11, color: '#aaaaaa', fontWeight: 500, marginTop: 4 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -174,16 +177,16 @@ function ParseResult({ result, onConfirm, onReset }: { result: CsvParseResult; o
         {/* Errors */}
         {result.errors.length > 0 && (
           <div style={{
-            marginBottom: 16, borderRadius: 12,
-            border: '1px solid #fecaca', background: '#fff5f5', overflow: 'hidden',
+            marginBottom: 14, borderRadius: 12,
+            border: '1px solid #fecaca', background: '#fef2f2', overflow: 'hidden',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderBottom: '1px solid #fecaca' }}>
-              <AlertCircle style={{ width: 16, height: 16, color: '#dc2626' }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#dc2626' }}>Errores ({result.errors.length})</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid #fecaca' }}>
+              <AlertCircle style={{ width: 15, height: 15, color: '#dc2626' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#dc2626' }}>Errores ({result.errors.length})</span>
             </div>
-            <div style={{ padding: 12, maxHeight: 176, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ padding: 10, maxHeight: 160, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 5 }}>
               {result.errors.slice(0, 10).map((e, i) => (
-                <div key={i} style={{ fontSize: 11, color: '#dc2626', background: 'rgba(220,38,38,0.08)', borderRadius: 8, padding: '6px 12px' }}>
+                <div key={i} style={{ fontSize: 11, color: '#dc2626', background: 'rgba(220,38,38,0.06)', borderRadius: 6, padding: '5px 10px' }}>
                   <span style={{ fontWeight: 700 }}>Fila {e.row}:</span> {e.message}
                   {e.value ? <span style={{ opacity: 0.6, marginLeft: 4 }}>({String(e.value).slice(0, 40)})</span> : null}
                 </div>
@@ -200,43 +203,43 @@ function ParseResult({ result, onConfirm, onReset }: { result: CsvParseResult; o
         {/* Preview table */}
         {result.agents.length > 0 && (
           <div style={{
-            marginBottom: 24, borderRadius: 12,
-            border: '1px solid #e0dbd0', background: '#fff', overflow: 'hidden',
+            marginBottom: 20, borderRadius: 12,
+            border: '1px solid #e8e8e8', background: '#ffffff', overflow: 'hidden',
           }}>
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid #e0dbd0' }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#1c1917' }}>
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid #f0f0f0' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#111111' }}>
                 Vista previa — {result.agents.length} agentes
               </span>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#faf7f2' }}>
+                  <tr style={{ background: '#fafafa' }}>
                     {['Nombre', 'Usuario', 'Líder', 'Segmento', 'Horario', 'Contrato'].map((h) => (
                       <th key={h} style={{
-                        padding: '8px 12px', textAlign: 'left',
-                        fontWeight: 600, color: '#a8a29e',
+                        padding: '7px 12px', textAlign: 'left',
+                        fontWeight: 600, color: '#bbbbbb',
                         textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 10,
-                        borderBottom: '1px solid #e0dbd0',
+                        borderBottom: '1px solid #f0f0f0',
                       }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {result.agents.slice(0, 8).map((a, idx) => (
-                    <tr key={a.id} style={{ background: idx % 2 === 0 ? '#fff' : '#faf7f2' }}>
-                      <td style={{ padding: '8px 12px', fontWeight: 600, color: '#1c1917' }}>{a.nombre}</td>
-                      <td style={{ padding: '8px 12px', color: '#78716c', fontFamily: 'monospace', fontSize: 11 }}>{a.usuario}</td>
-                      <td style={{ padding: '8px 12px', color: '#44403c' }}>{a.jefe}</td>
-                      <td style={{ padding: '8px 12px', color: '#78716c' }}>{a.segmento}</td>
-                      <td style={{ padding: '8px 12px', color: '#44403c' }}>{a.entryTime}–{a.exitTime}</td>
-                      <td style={{ padding: '8px 12px', color: '#78716c' }}>{a.contrato}</td>
+                    <tr key={a.id} style={{ background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                      <td style={{ padding: '7px 12px', fontWeight: 600, color: '#111111' }}>{a.nombre}</td>
+                      <td style={{ padding: '7px 12px', color: '#888888', fontFamily: 'monospace', fontSize: 11 }}>{a.usuario}</td>
+                      <td style={{ padding: '7px 12px', color: '#555555' }}>{a.jefe}</td>
+                      <td style={{ padding: '7px 12px', color: '#888888' }}>{a.segmento}</td>
+                      <td style={{ padding: '7px 12px', color: '#555555' }}>{a.entryTime}–{a.exitTime}</td>
+                      <td style={{ padding: '7px 12px', color: '#888888' }}>{a.contrato}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               {result.agents.length > 8 && (
-                <p style={{ textAlign: 'center', fontSize: 11, color: '#a8a29e', padding: 8, margin: 0 }}>
+                <p style={{ textAlign: 'center', fontSize: 11, color: '#aaaaaa', padding: 8, margin: 0 }}>
                   …y {result.agents.length - 8} agentes más
                 </p>
               )}
@@ -249,30 +252,30 @@ function ParseResult({ result, onConfirm, onReset }: { result: CsvParseResult; o
           <button
             onClick={onReset}
             style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 500,
-              color: '#78716c', background: '#fff', border: '1px solid #d4cfc5',
+              display: 'flex', alignItems: 'center', gap: 7,
+              padding: '8px 14px', borderRadius: 9, fontSize: 13, fontWeight: 500,
+              color: '#666666', background: '#ffffff', border: '1px solid #e8e8e8',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#1c1917'; e.currentTarget.style.borderColor = '#1c1917'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#78716c'; e.currentTarget.style.borderColor = '#d4cfc5'; }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#111111'; e.currentTarget.style.borderColor = '#cccccc'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#666666'; e.currentTarget.style.borderColor = '#e8e8e8'; }}
           >
-            <X style={{ width: 16, height: 16 }} />
+            <X style={{ width: 15, height: 15 }} />
             Cargar otro archivo
           </button>
           <button
             onClick={onConfirm}
             disabled={!canProceed}
             style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-              color: '#f2ede4', background: canProceed ? '#1c1917' : '#d4cfc5',
+              display: 'flex', alignItems: 'center', gap: 7,
+              padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+              color: '#ffffff', background: canProceed ? '#111111' : '#d8d8d8',
               border: 'none', cursor: canProceed ? 'pointer' : 'not-allowed',
-              boxShadow: canProceed ? '0 4px 16px rgba(28,25,23,0.2)' : 'none',
+              boxShadow: canProceed ? '0 2px 12px rgba(0,0,0,0.14)' : 'none',
               transition: 'all 0.15s',
             }}
           >
-            <CheckCircle style={{ width: 16, height: 16 }} />
+            <CheckCircle style={{ width: 15, height: 15 }} />
             Confirmar — {result.agents.length} agentes
           </button>
         </div>

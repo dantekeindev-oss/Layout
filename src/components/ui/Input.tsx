@@ -15,36 +15,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-sm font-medium text-slate-200 mb-1"
-          >
+          <label htmlFor={inputId} className="block text-sm font-medium text-[#333333] mb-1">
             {label}
           </label>
         )}
         <input
           ref={ref}
           id={inputId}
-          className={clsx(
-            'input',
-            {
-              'border-danger-500 focus:border-danger-500 focus:ring-danger-500': error,
-            },
-            className
-          )}
+          className={clsx('input', { 'border-red-400 focus:border-red-500': error }, className)}
           {...props}
         />
-        {error && (
-          <p className="mt-1 text-sm text-red-400">{error}</p>
-        )}
-        {helperText && !error && (
-          <p className="mt-1 text-sm text-slate-500">{helperText}</p>
-        )}
+        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {helperText && !error && <p className="mt-1 text-xs text-[#aaaaaa]">{helperText}</p>}
       </div>
     );
   }
 );
-
 Input.displayName = 'Input';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -62,23 +48,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label
-            htmlFor={selectId}
-            className="block text-sm font-medium text-slate-200 mb-1"
-          >
+          <label htmlFor={selectId} className="block text-sm font-medium text-[#333333] mb-1">
             {label}
           </label>
         )}
         <select
           ref={ref}
           id={selectId}
-          className={clsx(
-            'input',
-            {
-              'border-danger-500 focus:border-danger-500 focus:ring-danger-500': error,
-            },
-            className
-          )}
+          className={clsx('input', { 'border-red-400 focus:border-red-500': error }, className)}
           {...props}
         >
           {options.map((option) => (
@@ -87,15 +64,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && (
-          <p className="mt-1 text-sm text-red-400">{error}</p>
-        )}
-        {helperText && !error && (
-          <p className="mt-1 text-sm text-slate-500">{helperText}</p>
-        )}
+        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {helperText && !error && <p className="mt-1 text-xs text-[#aaaaaa]">{helperText}</p>}
       </div>
     );
   }
 );
-
 Select.displayName = 'Select';

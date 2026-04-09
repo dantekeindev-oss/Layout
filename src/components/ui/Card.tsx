@@ -7,8 +7,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({ children, className
   <div
     ref={ref}
     className={clsx(
-      'bg-slate-800 rounded-xl border border-slate-700 shadow-lg',
-      hover && 'hover:border-slate-500 hover:shadow-xl transition-all cursor-pointer',
+      'bg-white rounded-xl border border-[#e8e8e8]',
+      hover && 'hover:border-[#cccccc] hover:shadow-md transition-all cursor-pointer',
       className
     )}
     onClick={onClick}
@@ -19,7 +19,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({ children, className
 Card.displayName = 'Card';
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={clsx('px-4 py-3 border-b border-slate-700', className)}>{children}</div>;
+  return <div className={clsx('px-4 py-3 border-b border-[#f0f0f0]', className)}>{children}</div>;
 }
 
 export function CardBody({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -27,5 +27,5 @@ export function CardBody({ children, className }: { children: React.ReactNode; c
 }
 
 export function CardFooter({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={clsx('px-4 py-3 border-t border-slate-700 bg-slate-900/50', className)}>{children}</div>;
+  return <div className={clsx('px-4 py-3 border-t border-[#f0f0f0] bg-[#fafafa]', className)}>{children}</div>;
 }
